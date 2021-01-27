@@ -42,8 +42,8 @@ LRESULT CContentsListView::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			//case VK_ESCAPE: //m_pDlg->m_edFilter.DirectMessage(uMsg, wParam, lParam);
 			case VK_DELETE:
-				OnDelContent();
-				thePlugin.ReparseCurrentFile();
+				OnDelContents();
+				thePlugin.ReparseCurFile();
 				break;
 
 			case VK_UP:
@@ -174,7 +174,7 @@ void CContentsListView::OnLMouseUp(UINT nFlags, CPoint point)
 		{
 			thePlugin.CutLines(mMoveLineStart, mMoveLineEnd);
 			thePlugin.PasteBeforeLine(line);
-			thePlugin.ReparseCurrentFile();
+			thePlugin.ReparseCurFile();
 		}
 		
 		//}
@@ -195,6 +195,11 @@ void CContentsListView::ChangeItem()
 	LOGINFO(_T("Hot Item's line: %d\n"), line);
 	thePlugin.GotoLine(line);
 	LOGFUNEND;
+}
+
+void CContentsListView::OnListViewItemRClicked()
+{
+
 }
 
 //CListCtrl::SortItems使用的回调函数
@@ -284,7 +289,7 @@ int CContentsListView::AddListViewItem(int nItem, const TCHAR* tszContentName, i
 
 void CContentsListView::FocusLastItem()
 {
-	int line = thePlugin.GetCurrentLine();
+	int line = thePlugin.GetCurLineNo();
 	int item = GetItemByLine(line);
 	FocusItem(item);
 }
@@ -344,7 +349,7 @@ void CContentsListView::SortItemsByLine()
 	SortItems((PFNLVCOMPARE)CompareFunc, (DWORD)this);
 }
 //wait to test
-void CContentsListView::OnDelContent()
+void CContentsListView::OnDelContents()
 {
 	LOGFUNBGN;
 
@@ -392,14 +397,14 @@ void CContentsListView::OnDelContent()
 	if (nItem != GetItemCount())
 		lineEnd = GetLineByItem(nItem);
 	else
-		lineEnd = thePlugin.GetMaxLine();
+		lineEnd = thePlugin.GetLineCount();
 	
 	LOGINFO(_T("Line %d to %d to be deleted！"), lineStart, lineEnd - 1);
 	thePlugin.CutLines(lineStart, lineEnd - 1);	
 	LOGFUNEND;
 }
 //wait to test
-void CContentsListView::OnCutContent()
+void CContentsListView::OnCutContents()
 {
 	LOGFUNBGN;
 	int iItem = GetSelectionMark();
@@ -412,7 +417,7 @@ void CContentsListView::OnCutContent()
 	}
 	else
 	{
-		nLineEnd = thePlugin.GetMaxLine();
+		nLineEnd = thePlugin.GetLineCount();
 	}
 
 	LOGINFO(_T("Item to be cut: %d"), iItem + 1);
@@ -424,7 +429,7 @@ void CContentsListView::OnCutContent()
 	LOGFUNEND;
 }
 
-void CContentsListView::OnInsetContentBefore()
+void CContentsListView::OnInsetContentsBefore()
 {
 	LOGFUNBGN;
 
@@ -432,11 +437,11 @@ void CContentsListView::OnInsetContentBefore()
 	int line = GetLineByItem(iItem);
 
 	thePlugin.PasteBeforeLine(line);
-	thePlugin.ReparseCurrentFile();
+	thePlugin.ReparseCurFile();
 	LOGFUNEND;
 }
 //wait to test
-void CContentsListView::OnSelectContent()
+void CContentsListView::OnSelectContents()
 {
 	LOGFUNBGN;
 	
@@ -450,7 +455,7 @@ void CContentsListView::OnSelectContent()
 	}
 	else
 	{
-		nLineEnd = thePlugin.GetMaxLine();
+		nLineEnd = thePlugin.GetLineCount();
 	}
 	
 	thePlugin.SelectLines(nLineStart, nLineEnd);

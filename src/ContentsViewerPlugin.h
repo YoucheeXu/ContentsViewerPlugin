@@ -1,5 +1,6 @@
-#ifndef CCONTENTSVIEWERPLUGIN_H
-#define CCONTENTSVIEWERPLUGIN_H
+#pragma once
+#ifndef _CCONTENTSVIEWERPLUGIN_H_
+#define _CCONTENTSVIEWERPLUGIN_H_
 
 // All difinitions of plugin interface
 #include "help.h"
@@ -15,7 +16,7 @@ class CContentsViewerPlugin : public CWinApp
 public:
 	CContentsViewerPlugin();
 	~CContentsViewerPlugin();
-	
+
 private:
 	DISALLOW_COPY_AND_ASSIGN(CContentsViewerPlugin);
 
@@ -29,23 +30,23 @@ public:
 	BOOL IsCVDlgVisable();
 	bool IsCVDlgExist();
 	void ShowCVDlg();
-	HWND GetCVDlgHwnd();
+	HWND GetCVDlgHWnd();
 
-	const NppData& GetNppData() const { return mNppData; }
-	void SetNppData(const NppData& nppd);
+	const NPPData& GetNPPData() const {return mNPPData;}
+	void SetNPPData(const NPPData& nppd);
 
-	const HWND GetMainHwnd() const { return mHMainWnd; }
-	void SetMainHwnd(HWND hWnd) { mHMainWnd = hWnd; }
+	const HWND GetMainHWnd() const { return mHMainWnd; }
+	void SetMainHWnd(HWND hWnd) { mHMainWnd = hWnd; }
 
-	HWND GetEditHwnd() const;
+	HWND GetEditHWnd() const;
 
 	//NPP MSG
 	void OnFileActivated();
 	void OnFileSaved();
 	void OnFileOpened();
 	void OnFileClosed();
-	void OnNppTBModification();
-	void OnNppReady();
+	void OnNPPTBModification();
+	void OnNPPReady();
 	void OnSelectionChanged();
 
 	HICON GetTabIcon() const {return mHTabIcon;}
@@ -53,33 +54,33 @@ public:
 	int IndexContents(const TCHAR* tszText, const TCHAR* tszKeyword, int level);
 	int FindAndReplace(const TCHAR* tszFind, const TCHAR* tszReplace, bool isRegularMode);
 	void GotoLine(int line);
-	void DeleteLine(int line);
+	void DelLine(int line);
 
 	void CutLines(int lineStart, int lineEnd);
 	void PasteBeforeLine(int line);
 	void ReplaceLine(int line, const TCHAR* tszTxt);
-	void ReparseCurrentFile();
+	void ReparseCurFile();
 	int GetLine(int line, tString& tLine);
-	int GetMaxLine();
-	int GetCurrentLine();
+	int GetLineCount();
+	int GetCurLineNo();
 	bool SelectLines(int fromline, int endline);
 	bool GetSelection(tString &str);
 	bool ReplaceSelection(tString tStr);
 	bool GetDocument(tString &file);
 	bool SetDocument(const tString &file);
 
-	LRESULT SendNppMsg(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0) const;
-	LRESULT SendNppMsg(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0);
+	LRESULT SendNPPMsg(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0) const;
+	LRESULT SendNPPMsg(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0);
 
-	TCHAR* GetNppDirectory();
+	TCHAR* GetNPPDirectory();
 	TCHAR* GetPluginsConfigDir();
-	void SaveCurrentFile();
+	void SaveCurFile();
 
-	void UpdateCurrentFileCodePage();
-	int GetCurrentFileEncoding();
-	void SetCurrentFileEncoding(int encoding);
+	void UpdateCurFileCodePage();
+	int GetCurFileEncoding();
+	void SetCurFileEncoding(int encoding);
 
-	void CallNppCommand(int commandID);
+	void CallNPPCmd(int commandID);
 
 	void ActiveContentListviewItem();
 
@@ -90,7 +91,7 @@ private:
 
 protected:
 	CContentsViewerDialog mCVDlg;
-	NppData      mNppData;
+	NPPData      mNPPData;
 	HWND		mHMainWnd;
 	HICON        mHTabIcon;
 
@@ -141,11 +142,10 @@ void commandMenuCleanUp();
 //
 bool setCommand(size_t index, TCHAR *cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey *sk = NULL, bool check0nInit = false);
 
-
 //
 // Your plugin command functions
 //
 void openContentsViewerDlg();
 void openAboutDlg();
 
-#endif//CCONTENTSVIEWERPLUGIN_H
+#endif	//_CCONTENTSVIEWERPLUGIN_H_

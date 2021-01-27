@@ -14,11 +14,9 @@ c++代码要用到 “繁体简体映射表”博文中的映射表
 #include <map>
 using namespace std;
 
-
 const int MAX_LENGTH = 65535;
 //数组map_array 用于存储繁体所对应的简体字符
 string map_array[MAX_LENGTH] = {""}; 
-
 
 void init_map_array()
 {
@@ -30,15 +28,15 @@ void init_map_array()
 	int  index;
 	unsigned char ch1;
 	unsigned char ch2;
-	int i=0;
+	int i = 0;
 	while(!fin.eof())
 	{
 		index = 0;
 		fin.getline(line,1023);
-		if(strlen(line) == 0)
+		if(strlen(line) = =  0)
 			continue;
 		//去掉映射表中重复的列
-		if(line_map.find(line) != line_map.end())
+		if(line_map.find(line) ! =  line_map.end())
 			continue;
 		line_map.insert(pair<string, int>(line, 1));
 		ch1 = line[0];
@@ -47,7 +45,7 @@ void init_map_array()
 		index = (int)ch1 * 256;
 		index = index + ch2;
 		string strline = line;
-		if(map_array[index].length()!=0)
+		if(map_array[index].length()! = 0)
 		{
 			//一个繁体对应多个简体的情况。
 			string tmp = map_array[index];
@@ -61,7 +59,6 @@ void init_map_array()
 	fin.close();
 }
 
-
 string regular_tranf_simple(char* regular_str)
 {
 	if(strlen(regular_str)<2)
@@ -73,7 +70,7 @@ string regular_tranf_simple(char* regular_str)
 	ch2 = *locale_regular;
 	int index = (short)ch1*256;
 	index = index + ch2; 
-	if(index >= MAX_LENGTH)
+	if(index > =  MAX_LENGTH)
 	return 0;
 	string simple_word = map_array[index];
 	return simple_word;
@@ -85,42 +82,39 @@ int main(int argc, char* argv)
 	char regular_str[3] = "綵";
 	string simple_str;
 	simple_str = regular_tranf_simple(regular_str);
-	cout << regular_str << "=>" << simple_str << endl;
+	cout << regular_str << " = >" << simple_str << endl;
 }
-输出：綵=>彩,采
-
-
+输出：綵 = >彩,采
 
 简体和繁体内码互转的C++代码
 
-
 CString CChineseCodeLib::Big5ToGBK(LPCTSTR strBig5)
 { 
-	char* pszBig5=NULL; //Big5编码的字符 
-	wchar_t* wszUnicode=NULL; //Unicode编码的字符 
-	char* pszGbt=NULL; //Gb编码的繁体字符 
-	char* pszGbs=NULL; //Gb编码的简体字符 
+	char* pszBig5 = NULL; //Big5编码的字符 
+	wchar_t* wszUnicode = NULL; //Unicode编码的字符 
+	char* pszGbt = NULL; //Gb编码的繁体字符 
+	char* pszGbs = NULL; //Gb编码的简体字符 
 	CString strGBK; //返回的字符串 
-	int iLen=0; //需要转换的字符数 
-	pszBig5=(LPTSTR)strBig5; //读入需要转换的字符参数 
+	int iLen = 0; //需要转换的字符数 
+	pszBig5 = (LPTSTR)strBig5; //读入需要转换的字符参数 
 	//计算转换的字符数 
-	iLen=MultiByteToWideChar (950, 0, pszBig5, -1, NULL,0) ; 
+	iLen = MultiByteToWideChar(950, 0, pszBig5, -1, NULL, 0); 
 	//给wszUnicode分配内存 
-	wszUnicode=new wchar_t[iLen+1]; 
+	wszUnicode = new wchar_t[iLen+1]; 
 	//转换Big5码到Unicode码，使用了API函数MultiByteToWideChar 
-	MultiByteToWideChar (950, 0, pszBig5, -1, wszUnicode,iLen); 
+	MultiByteToWideChar(950, 0, pszBig5, -1, wszUnicode, iLen); 
 	//计算转换的字符数 
-	iLen=WideCharToMultiByte (936, 0, (PWSTR) wszUnicode, -1, NULL,0, NULL, NULL) ; 
+	iLen = WideCharToMultiByte(936, 0, (PWSTR) wszUnicode, -1, NULL,0, NULL, NULL) ; 
 	//给pszGbt分配内存 
-	pszGbt=new char[iLen+1]; 
+	pszGbt = new char[iLen+1]; 
 	//给pszGbs分配内存 
-	pszGbs=new char[iLen+1]; 
+	pszGbs = new char[iLen+1]; 
 	//转换Unicode码到Gb码繁体，使用API函数WideCharToMultiByte 
-	WideCharToMultiByte (936, 0, (PWSTR) wszUnicode, -1, pszGbt,iLen, NULL, NULL) ; 
+	WideCharToMultiByte(936, 0, (PWSTR) wszUnicode, -1, pszGbt, iLen, NULL, NULL) ; 
 	//转换Gb码繁体到Gb码简体，使用API函数LCMapString 
 	LCMapString(0x0804, LCMAP_SIMPLIFIED_CHINESE, pszGbt, -1, pszGbs, iLen); 
 	//返回Gb码简体字符 
-	strGBK=pszGbs; 
+	strGBK = pszGbs; 
 	//释放内存 
 	delete [] wszUnicode; 
 	delete [] pszGbt; 
@@ -131,32 +125,32 @@ CString CChineseCodeLib::Big5ToGBK(LPCTSTR strBig5)
 
 CString CChineseCodeLib::GBKToBig5(LPCTSTR strGBK)
 {
-	char* pszGbt=NULL; //Gb编码的繁体字符
-	char* pszGbs=NULL; //Gb编码的简体字符
-	wchar_t* wszUnicode=NULL; //Unicode编码的字符
-	char* pszBig5=NULL; //Big5编码的字符
-	int iLen=0; //需要转换的字符数
+	char* pszGbt = NULL; //Gb编码的繁体字符
+	char* pszGbs = NULL; //Gb编码的简体字符
+	wchar_t* wszUnicode = NULL; //Unicode编码的字符
+	char* pszBig5 = NULL; //Big5编码的字符
+	int iLen = 0; //需要转换的字符数
 	CString strBig5; //返回的字符串
 
-	pszGbs=(char*)strGBK; //读入需要转换的字符参数
+	pszGbs = (char*)strGBK; //读入需要转换的字符参数
 
 	//计算转换的字符数
-	iLen=MultiByteToWideChar (936, 0, pszGbs, -1, NULL,0) ;
+	iLen = MultiByteToWideChar (936, 0, pszGbs, -1, NULL,0) ;
 
 	//给pszGbt分配内存
-	pszGbt=new char[iLen*2+1];
+	pszGbt = new char[iLen*2+1];
 	//转换Gb码简体到Gb码繁体，使用API函数LCMapString
 	LCMapString(0x0804, LCMAP_TRADITIONAL_CHINESE, pszGbs, -1, pszGbt, iLen*2);
 
 	//给wszUnicode分配内存
-	wszUnicode=new wchar_t[iLen+1];
+	wszUnicode = new wchar_t[iLen+1];
 	//转换Gb码到Unicode码，使用了API函数MultiByteToWideChar
 	MultiByteToWideChar (936, 0, pszGbt, -1, wszUnicode,iLen);
 
 	//计算转换的字符数
-	iLen=WideCharToMultiByte (950, 0, (PWSTR) wszUnicode, -1, NULL,0, NULL, NULL) ;
+	iLen = WideCharToMultiByte (950, 0, (PWSTR) wszUnicode, -1, NULL,0, NULL, NULL) ;
 	//给pszBig5分配内存
-	pszBig5=new char[iLen+1];
+	pszBig5 = new char[iLen+1];
 	//转换Unicode码到Big5码，使用API函数WideCharToMultiByte
 	WideCharToMultiByte (950, 0, (PWSTR) wszUnicode, -1, pszBig5,iLen, NULL, NULL) ;
 

@@ -5,7 +5,7 @@ using namespace regex_constants;
 using namespace std;
 
 extern FuncItem funcItem[nbFunc];
-//extern NppData nppData;
+//extern NPPData nppData;
 
 // global vars
 //bool g_bDebug;
@@ -30,9 +30,9 @@ void CContentsViewerPlugin::Initialize(HINSTANCE hInstance)
 {
 	SetResourceHandle(hInstance);
 	mHTabIcon = (HICON)::LoadImage(hInstance, 
-		MAKEINTRESOURCE(IDB_TOOLBAR), IMAGE_ICON, 0, 0, 
-		LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT);
-	//m_TB_Icon.hToolbarBmp = (HBITMAP) ::LoadImage(hInstance,
+		MAKEINTRESOURCE(IDB_CONTENTSVIEWER), IMAGE_ICON, 0, 0,
+		LR_LOADMAP3DCOLORS| LR_LOADTRANSPARENT);
+	//m_TB_Icon.hToolbarBmp = (HBITMAP)::LoadImage(hInstance,
 	// MAKEINTRESOURCE(IDB_TAGSVIEW), IMAGE_BITMAP, 0, 0, 
 	// LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS);
 }
@@ -44,7 +44,7 @@ void CContentsViewerPlugin::Uninitialize()
 		::DestroyIcon(mHTabIcon);
 		mHTabIcon = NULL;
 	}
-	//if (m_TB_Icon.hToolbarBmp)
+	//if ( m_TB_Icon.hToolbarBmp )
 	//{
 	//    ::DeleteObject(m_TB_Icon.hToolbarBmp);
 	//    m_TB_Icon.hToolbarBmp = NULL;
@@ -54,12 +54,13 @@ void CContentsViewerPlugin::Uninitialize()
 BOOL CContentsViewerPlugin::IsCVDlgVisable()
 {
 	return mCVDlg.IsWindowVisible();
+	//return mCVDlg.IsWindow();
 }
 
 bool CContentsViewerPlugin::IsCVDlgExist()
 {
-	//return mCVDlg.GetHwnd();
-	return (mCVDlg.IsWindow() == TRUE);								
+	//return (mCVDlg.GetHWnd() == NULL);
+	return (mCVDlg.IsWindow() == TRUE);
 }
 
 void CContentsViewerPlugin::ShowCVDlg()
@@ -67,22 +68,29 @@ void CContentsViewerPlugin::ShowCVDlg()
 	mCVDlg.DoModeless();
 }
 
-HWND CContentsViewerPlugin::GetCVDlgHwnd()
+HWND CContentsViewerPlugin::GetCVDlgHWnd()
 {
 	return mCVDlg.GetHwnd();
 }
 
-void CContentsViewerPlugin::SetNppData(const NppData& nppd)
+void CContentsViewerPlugin::SetNPPData(const NPPData& nppd)
 {
-	mNppData = nppd;
-	mCVDlg.SetNppWnd(nppd._nppHandle);
+	mNPPData = nppd;
+	mCVDlg.SetNPPWnd(nppd._nppHandle);
 }
 
-HWND CContentsViewerPlugin::GetEditHwnd() const
+HWND CContentsViewerPlugin::GetEditHWnd() const
 {
-	int currentView = 0;
-	SendNppMsg(NPPM_GETCURRENTSCINTILLA, 0, (LPARAM) &currentView);
-	return ((currentView == 0) ?  mNppData._scintillaMainHandle : mNppData._scintillaSecondHandle);
+	// Get the current scintilla
+	int currentView = -1;
+	SendNPPMsg(NPPM_GETCURRENTSCINTILLA, 0, (LPARAM) &currentView);
+	if (currentView == -1)
+	{
+		LOGERR("Can't get current scintilla!");
+		assert(NULL);
+		return NULL;
+	}
+	return ((currentView == 0)? mNPPData._scintillaMainHandle: mNPPData._scintillaSecondHandle);
 }
 
 //NPPN_BUFFERACTIVATED
@@ -90,7 +98,7 @@ void CContentsViewerPlugin::OnFileActivated()
 {
 	if (IsCVDlgExist())
 	{
-		if (IsCVDlgVisable()) thePlugin.ReparseCurrentFile();
+		if (IsCVDlgVisable()) thePlugin.ReparseCurFile();
 	}
 }
 
@@ -105,7 +113,7 @@ void CContentsViewerPlugin::OnFileOpened()
 	/*if (IsCVDlgExist())
 	{
 		if (IsCVDlgVisable())
-			thePlugin.ReparseCurrentFile();
+			thePlugin.ReparseCurFile();
 	}*/
 }
 
@@ -117,17 +125,18 @@ void CContentsViewerPlugin::OnFileClosed()
 }
 
 //NPPN_TBMODIFICATION
-void CContentsViewerPlugin::OnNppTBModification()
+void CContentsViewerPlugin::OnNPPTBModification()
 {
-	//toolbarIcons	g_TBHex;
-	// g_TBHex.hToolbarBmp = (HBITMAP)::LoadImage((HINSTANCE)g_hModule, MAKEINTRESOURCE(IDB_TB_HEX), IMAGE_BITMAP, 0, 0, (LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS));
-	//SendNppMsg(NPPM_ADDTOOLBARICON, (WPARAM)funcItem[0]._cmdID, (LPARAM)&g_TBHex);
+	/*toolbarIcons g_TBHex;
+	//g_TBHex.hToolbarBmp = (HBITMAP)::LoadImage((HINSTANCE)g_hModule, MAKEINTRESOURCE(IDB_TB_HEX), IMAGE_BITMAP, 0, 0, (LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS));
+	g_TBHex.hToolbarBmp = mHTabIcon;
+	SendNppMsg(NPPM_ADDTOOLBARICON, (WPARAM)funcItem[0]._cmdID, (LPARAM)&g_TBHex);*/
 }
 
 //NPPN_READY
-void CContentsViewerPlugin::OnNppReady()
+void CContentsViewerPlugin::OnNPPReady()
 {
-	//const HWND hSciEdit = GetEditHwnd();
+	//const HWND hSciEdit = GetEditHWnd();
 	//::SendMessage(hSciEdit, SCI_SETCODEPAGE, 936, 0);
 }
 
@@ -136,31 +145,32 @@ void CContentsViewerPlugin::OnSelectionChanged()
 {
 }
 
-LRESULT CContentsViewerPlugin::SendNppMsg(UINT uMsg, WPARAM wParam , LPARAM lParam ) const
+LRESULT CContentsViewerPlugin::SendNPPMsg(UINT uMsg, WPARAM wParam , LPARAM lParam ) const
 {
-	return ::SendMessage(mNppData._nppHandle, uMsg, wParam, lParam);
+	return ::SendMessage(mNPPData._nppHandle, uMsg, wParam, lParam);
 }
 
-LRESULT CContentsViewerPlugin::SendNppMsg(UINT uMsg, WPARAM wParam , LPARAM lParam )
+LRESULT CContentsViewerPlugin::SendNPPMsg(UINT uMsg, WPARAM wParam , LPARAM lParam )
 {
-	return ::SendMessage(mNppData._nppHandle, uMsg, wParam, lParam);
+	return ::SendMessage(mNPPData._nppHandle, uMsg, wParam, lParam);
 }
 
-int CContentsViewerPlugin::GetMaxLine()
+int CContentsViewerPlugin::GetLineCount()
 {
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	return (int)::SendMessage(hSciEdit, SCI_GETLINECOUNT, 0, 0);
 }
 
 void CContentsViewerPlugin::GotoLine(int line)
 {
 	mCVDlg.SavePos(line);
-	/*if (line == GetMaxLine())
+	/*if (line == GetLineCount())
 		line = line + 5;
 	else if(line >= 5)
 		line = line - 5;*/
 
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
+	if(NULL == hSciEdit) return;
 	//int pos = (int)::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line, 0);
 
 	//const int line = (int) ::SendMessage(hSciEdit, SCI_LINEFROMPOSITION, selStart, 0);
@@ -174,13 +184,15 @@ void CContentsViewerPlugin::GotoLine(int line)
 	//if(line >= 5) line = line - 5;
 	//line = line + 5;
 	//::SendMessage(hSciEdit, SCI_GOTOLINE, line + 1, 0);
-	::SendMessage(hSciEdit, SCI_GOTOLINE, line, 0);
+	/*::SendMessage(hSciEdit, SCI_GOTOLINE, line, 0);
 	//::SendMessage(hSciEdit, SCI_LINESCROLL, 0, line);
 	//::SendMessage(hSciEdit, SCI_GOTOPOS, pos, 0);
+
+	int currentLine = GetCurLine();
 	
-	int currentLine = GetCurrentLine();
-	
-	::SendMessage(hSciEdit, SCI_GOTOLINE, line * 2 - currentLine, 0);
+	::SendMessage(hSciEdit, SCI_GOTOLINE, line * 2 - currentLine, 0);*/
+	::SendMessage(hSciEdit, SCI_ENSUREVISIBLE, line - 1, 0);
+	::SendMessage(hSciEdit, SCI_GOTOLINE, line - 1, 0);
 
 	////These messages retrieve and set the line number of the first visible line in the Scintilla view. The first line in the document is numbered 0. The value is a visible line rather than a document line.
 	//int firstLine = (int)::SendMessage(hSciEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
@@ -201,10 +213,10 @@ void CContentsViewerPlugin::GotoLine(int line)
 	::UpdateWindow(hSciEdit);  
 }
 
-void CContentsViewerPlugin::DeleteLine(int line)
+void CContentsViewerPlugin::DelLine(int line)
 {
 	line = line - 1;
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	int pos = (int)::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line, 0);
 	unsigned int len = ::SendMessage(hSciEdit, SCI_GETLINE, line, 0);
 	::SendMessage(hSciEdit, SCI_DELETERANGE, pos, len);	
@@ -212,7 +224,7 @@ void CContentsViewerPlugin::DeleteLine(int line)
 
 void CContentsViewerPlugin::CutLines(int lineStart, int lineEnd)
 {
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	int anchorPos = (int)::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, lineStart - 1, 0);
 	int currentPos = (int)::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, lineEnd - 1 + 1, 0);
 	//unsigned int len = ::SendMessage(hSciEdit, SCI_GETLINE, lineEnd - 1, 0);
@@ -226,7 +238,7 @@ void CContentsViewerPlugin::CutLines(int lineStart, int lineEnd)
 
 void CContentsViewerPlugin::PasteBeforeLine(int line)
 {
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	int pos = (int)::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line - 1, 0);
 	::SendMessage(hSciEdit, SCI_GOTOPOS, pos, 0);
 	::SendMessage(hSciEdit, SCI_PASTE, 0, 0);
@@ -235,7 +247,7 @@ void CContentsViewerPlugin::PasteBeforeLine(int line)
 void CContentsViewerPlugin::ReplaceLine(int line, const TCHAR* tszTxt)
 {
 	LOGFUNBGN;
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 
 	string sLine = TtoA(tszTxt, m_nCodePage);
 	char* szLine = const_cast<char*>(sLine.c_str());
@@ -251,11 +263,12 @@ void CContentsViewerPlugin::ReplaceLine(int line, const TCHAR* tszTxt)
 	LOGFUNEND;
 }
 
-void CContentsViewerPlugin::ReparseCurrentFile()
+void CContentsViewerPlugin::ReparseCurFile()
 {
 	LOGFUNBGN;
-	LOGINFO(_T("CContentsViewerPlugin::ReparseCurrentFile()"));
-	mCVDlg.ReparseCurrentFile();
+	LOGINFO(_T("CContentsViewerPlugin::ReparseCurFile()"));
+	mCVDlg.ReparseCurFile();
+	//mCVDlg.ParseCurFile();
 	LOGFUNEND;
 }
 
@@ -264,18 +277,19 @@ int CContentsViewerPlugin::IndexContents(const TCHAR* tText, const TCHAR* tszKey
 	LOGFUNBGN;
 
 	//LOGINFO(_T("REGEXP: %s, keyword %s, level: %d"), tText, tszKeyword, level);
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	int searchFlags = SCFIND_REGEXP + SCFIND_POSIX;
 	//int searchFlags = SCFIND_MATCHCASE;
 
 	TextToFind ttf;
 	int pos = 0;
-	int n = 0;
+	// int n = 0;
 	int i = 0;
 	ttf.chrg.cpMin = 0;
 	ttf.chrg.cpMax = ::SendMessage(hSciEdit, SCI_GETLENGTH, 0, 0);
 
 	string text;
+
 	//if (936 == m_nCodePage) text = T2A(tText, CP_ACP);
 	//else text = T2A(tText, 65001);
 	text = TtoA(tText, m_nCodePage);
@@ -335,7 +349,7 @@ void  CContentsViewerPlugin::ActiveContentListviewItem()
 	{
 		if(IsCVDlgVisable())
 		{
-			int line = GetCurrentLine();
+			int line = GetCurLineNo();
 			mCVDlg.FocuseContentListviewItemByLine(line);
 		}
 	}
@@ -357,7 +371,7 @@ int CContentsViewerPlugin::FindAndReplace(const TCHAR* tszFind, const TCHAR* tsz
 
 	LOGINFO(_T("tFind: %s, tReplace: %s. regularMode: %d."), tszFind, tszReplace, isRegularMode);
 
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	int searchFlags;
 
 	/*#define SCFIND_WHOLEWORD 2
@@ -375,7 +389,7 @@ int CContentsViewerPlugin::FindAndReplace(const TCHAR* tszFind, const TCHAR* tsz
 	int count = 0;
 	TextToFind ttf;
 	int pos = 0;
-	int i = 0;
+	// int i = 0;
 	ttf.chrg.cpMin = 0;
 	ttf.chrg.cpMax = ::SendMessage(hSciEdit, SCI_GETLENGTH, 0, 0);
 
@@ -426,7 +440,7 @@ bool CContentsViewerPlugin::SelectLines(int fromline, int endline)
 {
 	LOGFUNBGN;	
 	
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	
 	int currentPos = ::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, fromline - 1, 0);
 	//int currentPos = ::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line + 1, 0);
@@ -443,7 +457,7 @@ bool CContentsViewerPlugin::SelectLines(int fromline, int endline)
 int CContentsViewerPlugin::GetLine(int line, tString& tLine)
 {
 	LOGFUNBGN;
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 
 	int len = ::SendMessage(hSciEdit, SCI_GETLINE, line - 1, 0);
 
@@ -465,22 +479,22 @@ int CContentsViewerPlugin::GetLine(int line, tString& tLine)
 	return linelen + 1;
 }
 
-int CContentsViewerPlugin::GetCurrentLine()
+int CContentsViewerPlugin::GetCurLineNo()
 {
-	return SendNppMsg(NPPM_GETCURRENTLINE, 0, 0) + 1;
+	return SendNPPMsg(NPPM_GETCURRENTLINE, 0, 0) + 1;
 }
 
 bool CContentsViewerPlugin::GetSelection(tString &str)
 {
-	bool bDebug = true;
+	// bool bDebug = true;
 	//int anchorPos = 0, currentPos = 0;
-	////SendNppMsg(SCI_GETCURRENTPOS, 0, currentPos);
-	//SendNppMsg(SCI_GETSELECTIONSTART, 0, anchorPos);
-	////SendNppMsg(SCI_GETANCHOR, 0, anchorPos);
-	//SendNppMsg(SCI_GETSELECTIONEND, 0, currentPos);
+	////SendNPPMsg(SCI_GETCURRENTPOS, 0, currentPos);
+	//SendNPPMsg(SCI_GETSELECTIONSTART, 0, anchorPos);
+	////SendNPPMsg(SCI_GETANCHOR, 0, anchorPos);
+	//SendNPPMsg(SCI_GETSELECTIONEND, 0, currentPos);
 	//char* text = new char[abs(currentPos - anchorPos)];
 
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 
 	int len = ::SendMessage(hSciEdit, SCI_GETSELTEXT, 0, 0);
 
@@ -498,7 +512,7 @@ bool CContentsViewerPlugin::ReplaceSelection(tString tStr)
 	//WideChar2MultiByte(tStr.c_str(), str);
 	str = TtoA(tStr.c_str(), m_nCodePage);
 
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	::SendMessage(hSciEdit, SCI_REPLACESEL, (WPARAM)0, (LPARAM)str.c_str());
 
 	return true;
@@ -506,9 +520,9 @@ bool CContentsViewerPlugin::ReplaceSelection(tString tStr)
 
 bool CContentsViewerPlugin::GetDocument(tString &file)
 {
-	bool bDebug = true;
+	// bool bDebug = true;
 
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 
 	int len = ::SendMessage(hSciEdit, SCI_GETLENGTH, 0, 0);
 
@@ -522,9 +536,9 @@ bool CContentsViewerPlugin::GetDocument(tString &file)
 
 bool CContentsViewerPlugin::SetDocument(const tString &file)
 {
-	bool bDebug = true;
+	// bool bDebug = true;
 
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 
 	int len = ::SendMessage(hSciEdit, SCI_GETLENGTH, 0, 0);
 
@@ -534,7 +548,6 @@ bool CContentsViewerPlugin::SetDocument(const tString &file)
 
 	return true;
 }
-
 
 //void CContentsViewerPlugin::MultiByte2WideChar(const char* mb, tString& wc)
 //{
@@ -557,11 +570,11 @@ bool CContentsViewerPlugin::SetDocument(const tString &file)
 //	delete[] tmb;
 //}
 
-TCHAR* CContentsViewerPlugin::GetNppDirectory()
+TCHAR* CContentsViewerPlugin::GetNPPDirectory()
 {
 	LOGFUNBGN;
 	TCHAR nppDir[MAX_PATH];
-	SendNppMsg(NPPM_GETNPPDIRECTORY, (WPARAM)MAX_PATH, (LPARAM)nppDir);
+	SendNPPMsg(NPPM_GETNPPDIRECTORY, (WPARAM)MAX_PATH, (LPARAM)nppDir);
 	LOGINFO(_T("nppDir: %s"), nppDir);
 	return nppDir;
 }
@@ -569,53 +582,52 @@ TCHAR* CContentsViewerPlugin::GetNppDirectory()
 TCHAR* CContentsViewerPlugin::GetPluginsConfigDir()
 {
 	TCHAR pluginsConfDir[MAX_PATH];
-	SendNppMsg(NPPM_GETPLUGINSCONFIGDIR, (WPARAM)MAX_PATH, (LPARAM)pluginsConfDir);
+	SendNPPMsg(NPPM_GETPLUGINSCONFIGDIR, (WPARAM)MAX_PATH, (LPARAM)pluginsConfDir);
 	LOGINFO(_T("pluginsConfDir: %s"), pluginsConfDir);
 	return pluginsConfDir;
 }
 
-void CContentsViewerPlugin::SaveCurrentFile()
+void CContentsViewerPlugin::SaveCurFile()
 {
-	SendNppMsg(NPPM_SAVECURRENTFILE, 0, 0);
+	SendNPPMsg(NPPM_SAVECURRENTFILE, 0, 0);
 }
 
-void CContentsViewerPlugin::UpdateCurrentFileCodePage()
+void CContentsViewerPlugin::UpdateCurFileCodePage()
 {
-	const HWND hSciEdit = GetEditHwnd();
+	const HWND hSciEdit = GetEditHWnd();
 	m_nCodePage = ::SendMessage(hSciEdit, SCI_GETCODEPAGE, 0, 0);
-	LOGINFO(_T("Current File codepage: %d."), m_nCodePage);
+	LOGINFO(_T("Cur File codepage: %d."), m_nCodePage);
 	//::SendMessage(hSciEdit, SCI_SETCODEPAGE, 936, 0);
 }
 
-int CContentsViewerPlugin::GetCurrentFileEncoding()
+int CContentsViewerPlugin::GetCurFileEncoding()
 {
 	//Returns active document buffer ID
-	int bufferID = SendNppMsg(NPPM_GETCURRENTBUFFERID, 0 ,0);
+	int bufferID = SendNPPMsg(NPPM_GETCURRENTBUFFERID, 0 ,0);
 	//Get document's encoding from given buffer ID.
 
-	int encoding = SendNppMsg(NPPM_GETBUFFERENCODING, bufferID, 0);
-	//LOGINFOF(_T("Current File encoding: %d."), encoding);
+	int encoding = SendNPPMsg(NPPM_GETBUFFERENCODING, bufferID, 0);
+	LOGINFO(_T("Cur File encoding: %d."), encoding);
 
 	return encoding;
 }
 
-void CContentsViewerPlugin::SetCurrentFileEncoding(int encoding)
+void CContentsViewerPlugin::SetCurFileEncoding(int encoding)
 {
 	//Returns active document buffer ID
-	int bufferID = SendNppMsg(NPPM_GETCURRENTBUFFERID, 0 ,0);
+	int bufferID = SendNPPMsg(NPPM_GETCURRENTBUFFERID, 0 ,0);
 	//Get document's encoding from given buffer ID.
-	SendNppMsg(NPPM_SETBUFFERENCODING, bufferID, encoding);
+	SendNPPMsg(NPPM_SETBUFFERENCODING, bufferID, encoding);
 }
 
-void CContentsViewerPlugin::CallNppCommand(int commandID)
+void CContentsViewerPlugin::CallNPPCmd(int commandID)
 {
 	//call any the Notepad++ menu commands.
-	SendNppMsg(NPPM_MENUCOMMAND, 0, commandID);
+	SendNPPMsg(NPPM_MENUCOMMAND, 0, commandID);
 	//IDM_FORMAT_CONV2_ANSI
 }
 
 //----------------------------------------------------------------------------
-
 
 //// global vars
 //CContentsViewerPlugin thePlugin;
@@ -633,7 +645,7 @@ FuncItem funcItem[nbFunc];
 //
 // The data of Notepad++ that you can use in your plugin commands
 //
-//NppData nppData;
+//NPPData nppData;
 
 //
 // Initialize your plugin data here
@@ -645,7 +657,6 @@ FuncItem funcItem[nbFunc];
 //}
 
 //
-
 
 // Here you can do the clean up, save the parameters (if any) for the next session
 //
@@ -687,7 +698,6 @@ void commandMenuCleanUp()
 	delete funcItem[0]._pShKey;
 }
 
-
 //
 // This function help you to initialize your plugin commands
 //
@@ -721,28 +731,26 @@ void openContentsViewerDlg()
 		BOOL bCheck = TRUE;
 		if (thePlugin.IsCVDlgVisable())
 		{
-			//thePlugin.ewClearNavigationHistory(true);
-
 			uMsg = NPPM_DMMHIDE;
 			bCheck = FALSE;
 			bParseFile = true;
 		}
 
 		//show the dialog
-		thePlugin.SendNppMsg(uMsg, 0, (LPARAM) dockData.hClient);
+		thePlugin.SendNPPMsg(uMsg, 0, (LPARAM) dockData.hClient );
 		//set the check on menu item
-		//thePlugin.SendNppMsg( NPPM_SETMENUITEMCHECK, 
+		//thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, 
 		//  CContentsViewerDialog::FUNC_ARRAY[CContentsViewerDialog::EFI_TAGSVIEW]._cmdID,
 		//  bCheck );
-		thePlugin.SendNppMsg(NPPM_SETMENUITEMCHECK, funcItem[0]._cmdID, bCheck);
+		thePlugin.SendNPPMsg( NPPM_SETMENUITEMCHECK, funcItem[0]._cmdID,  bCheck);
 	}
 	else
 	{
 		lstrcpy(szPluginName, NPP_PLUGIN_NAME);
 		thePlugin.ShowCVDlg();
 
-		//dockData.hClient = thePlugin.GetCVDlg().GetHwnd();
-		dockData.hClient = thePlugin.GetCVDlgHwnd();
+		//dockData.hClient = thePlugin.GetCVDlg().GetHWnd();
+		dockData.hClient = thePlugin.GetCVDlgHWnd();
 		dockData.pszName = szPluginName;
 		dockData.dlgID = -1;
 		dockData.uMask = DWS_DF_CONT_LEFT | DWS_ICONTAB;
@@ -756,29 +764,30 @@ void openContentsViewerDlg()
 		dockData.pszModuleName = NPP_PLUGIN_NAME;
 
 		//set dialog dockable
-		thePlugin.SendNppMsg(NPPM_DMMREGASDCKDLG, 0, (LPARAM) &dockData);
+		thePlugin.SendNPPMsg( NPPM_DMMREGASDCKDLG, 0, (LPARAM) &dockData );
 		//register dialog
-		thePlugin.SendNppMsg(NPPM_MODELESSDIALOG, MODELESSDIALOGADD, (LPARAM) dockData.hClient);
+		thePlugin.SendNPPMsg( NPPM_MODELESSDIALOG, MODELESSDIALOGADD, (LPARAM) dockData.hClient );
 		//show the dialog
-		thePlugin.SendNppMsg(NPPM_DMMSHOW, 0, (LPARAM) dockData.hClient);
+		thePlugin.SendNPPMsg( NPPM_DMMSHOW, 0, (LPARAM) dockData.hClient );
 		//set the check on menu item
-		//thePlugin.SendNppMsg( NPPM_SETMENUITEMCHECK, 
+		//thePlugin.SendNPPMsg( NPPM_SETMENUITEMCHECK, 
 		//  CContentsViewerDialog::FUNC_ARRAY[CContentsViewerDialog::EFI_TAGSVIEW]._cmdID,
 		//  TRUE );
-		thePlugin.SendNppMsg(NPPM_SETMENUITEMCHECK, funcItem[0]._cmdID, TRUE);
+		thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, funcItem[0]._cmdID, TRUE);
 	}
 
 	if (bParseFile)
 	{
 		//theLogFile.LogOutA(__FUNCTION__);
-		thePlugin.ReparseCurrentFile();
+		thePlugin.ReparseCurFile();
 	}
 }
 
 void openAboutDlg()
 {
-	//::CreateDialog((HINSTANCE)g_hMod, MAKEINTRESOURCE(IDD_ABOUTDLG), thePlugin.GetMainHwnd(), abtDlgProc);
-	::MessageBox(thePlugin.GetMainHwnd(),
+	//::CreateDialog((HINSTANCE)g_hMod, MAKEINTRESOURCE(IDD_ABOUTDLG), thePlugin.GetMainHWnd(), abtDlgProc);
+	::MessageBox(
+		thePlugin.GetMainHWnd(),
 		_T("Haha!"),
 		NPP_PLUGIN_NAME,
 		MB_OK);
@@ -786,12 +795,12 @@ void openAboutDlg()
 
 //-----------------------------------------------
 
-extern "C" __declspec(dllexport) void setInfo(NppData notpadPlusData)
+extern "C" __declspec(dllexport) void setInfo(NPPData notpadPlusData)
 {
 	//nppData = notpadPlusData;
 	commandMenuInit();
-	thePlugin.SetNppData(notpadPlusData);
-	thePlugin.SetMainHwnd(notpadPlusData._nppHandle);
+	thePlugin.SetNPPData(notpadPlusData);
+	thePlugin.SetMainHWnd(notpadPlusData._nppHandle);
 }
 
 extern "C" __declspec(dllexport) const TCHAR * getName()
@@ -807,7 +816,7 @@ extern "C" __declspec(dllexport) FuncItem * getFuncsArray(int *nbF)
 
 extern "C" __declspec(dllexport) void beNotified(SCNotification *pscn)
 {
-	if (pscn->nmhdr.hwndFrom == thePlugin.GetNppData()._nppHandle)
+	if (pscn->nmhdr.hwndFrom == thePlugin.GetNPPData()._nppHandle)
 	{
 		switch (pscn->nmhdr.code)
 		{
@@ -833,11 +842,11 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification *pscn)
 			break;
 
 		case NPPN_TBMODIFICATION:
-			thePlugin.OnNppTBModification();
+			thePlugin.OnNPPTBModification();
 			break;
 
 		case NPPN_READY:
-			thePlugin.OnNppReady();
+			thePlugin.OnNPPReady();
 			break;
 		}
 	}
@@ -852,7 +861,7 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification *pscn)
 	}
 }
 
-// Here you can process the Npp Messages 
+// Here you can process the NPP Messages 
 // I will make the messages accessible little by little, according to the need of plugin development.
 // Please let me know if you need to access to some messages :
 // http://sourceforge.net/forum/forum.php?forum_id=482781
@@ -869,7 +878,7 @@ extern "C" __declspec(dllexport) LRESULT messageProc(UINT message, WPARAM wParam
 		case WM_MOUSEWHEEL:
 			thePlugin.ActiveContentListviewItem();
 			break;
-		
+
 		case WM_KEYUP:
 			switch (wParam)
 			{

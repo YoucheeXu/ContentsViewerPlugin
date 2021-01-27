@@ -22,6 +22,7 @@
     <ClCompile Include="..\src\ContentsListView.cpp" />
     <ClCompile Include="..\src\ContentsViewerDialog.cpp" />
     <ClCompile Include="..\src\ContentsViewerPlugin.cpp" />
+    <ClCompile Include="..\src\Document.cpp" />
     <ClCompile Include="..\src\help.cpp" />
     <ClCompile Include="..\src\IniFile.cpp" />
   </ItemGroup>
@@ -29,6 +30,7 @@
     <ClInclude Include="..\src\ContentsListView.h" />
     <ClInclude Include="..\src\ContentsViewerDialog.h" />
     <ClInclude Include="..\src\ContentsViewerPlugin.h" />
+    <ClInclude Include="..\src\Document.h" />
     <ClInclude Include="..\src\help.h" />
     <ClInclude Include="..\src\IniFile.h" />
     <ClInclude Include="..\src\LogFile.h" />

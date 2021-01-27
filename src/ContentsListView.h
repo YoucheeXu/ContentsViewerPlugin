@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CONTENTSLISTVIEW_H
 #define CONTENTSLISTVIEW_H
 
@@ -26,7 +27,7 @@ protected:
 	void OnLMouseUp(UINT nFlags, CPoint point);
 	void OnMouseMove(UINT nFlags, CPoint point);
 	
-	//void OnListViewItemClicked();
+	//void OnListViewItemLClicked();
 	void OnListViewItemRClicked();
 
 	void ChangeItem();
@@ -44,10 +45,10 @@ public:
 
 	void SortItemsByLine();
 
-	void OnDelContent();
-	void OnCutContent();
-	void OnInsetContentBefore();
-	void OnSelectContent();
+	void OnDelContents();
+	void OnCutContents();
+	void OnInsetContentsBefore();
+	void OnSelectContents();
 
 	int GetItemByLine(int line);
 	void FocusItem(int iItem);
