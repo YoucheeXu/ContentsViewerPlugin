@@ -41,6 +41,7 @@ protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	//virtual void OnCancel();
 	virtual BOOL OnInitDialog();
+	int CreateToolbar();
 	//virtual void OnOK();
 
 	virtual LRESULT OnNotify(WPARAM wParam, LPARAM lParam);
@@ -96,7 +97,9 @@ public:
 private:
 	bool m_bDebug;
 
-	CToolBar mToolBar;
+	CToolBar m_ToolBar;
+	CImageList m_ImageList;
+	//CToolTip m_ToolTip;
 
 	//HMENU m_hScriptMenu;
 	CMenu m_ScriptMenu;

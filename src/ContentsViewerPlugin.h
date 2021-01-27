@@ -49,7 +49,7 @@ public:
 	void OnNPPReady();
 	void OnSelectionChanged();
 
-	HICON GetTabIcon() const {return mHTabIcon;}
+	HICON GetTabIcon() const {return m_hTabIcon;}
 
 	int IndexContents(const TCHAR* tszText, const TCHAR* tszKeyword, int level);
 	int FindAndReplace(const TCHAR* tszFind, const TCHAR* tszReplace, bool isRegularMode);
@@ -94,8 +94,8 @@ protected:
 	CContentsViewerDialog mCVDlg;
 	NPPData      mNPPData;
 	HWND		mHMainWnd;
-	HICON        mHTabIcon;
-
+	HICON        m_hTabIcon;
+	toolbarIcons m_tbiJS;
 	UINT m_nCodePage;
 };
 

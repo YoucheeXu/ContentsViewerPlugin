@@ -1,0 +1,53 @@
+c/c++字节序与大小端转换
+
+一.多字节值及字节序
+
+1.brief
+
+现在有一个数字 65430，这个数字在二进制的内存中一个字节无法完全存下，存储这个数字需要1个字节以上的空间。这样的值被称为多字节量（multi-byte quantity）。
+
+65430在内存中由两个字节表示：0xFF 和 0x96 ，其中：
+0xFF被称为最高有效字节（most significant byte, MSB） 
+0x96 被称为最低有效字节（last significant byte, LSB）
+
+在内存中存储这样的多字节整数有两种方式
+
+大端：最高有效字节存储在较低的内存位置
+such as：
+0x0->0xFF
+0x1->0x96
+小端：最低有效字节存储在较低的内存位置
+such as：
+0x0->0x96
+0x1->0xFF
+
+2.整数字节序转换
+     整个过程从该值的MSB和LSB开始交换，直到交换至该值的中间点，唯一的难点在于,由于不能简单的把对象（结构型数据）转换为字节数组去用单一的通用函数转换字节，所以需要知道哪些字节序需要转换，例如 把内存中的struc或class写入文件时，要正确的转换字节序，便需要知道其中每个数据成员的位置及大小，并基于每个成员的大小逐一进行适当的转换
+[cpp] view plain copy 在CODE上查看代码片派生到我的代码片
+//对应int32大小的成员 的转换 范例   
+int32_t swapInt32(int32_t value)  
+{  
+     return ((value & 0x000000FF) << 24) |  
+               ((value & 0x0000FF00) << 8) |  
+               ((value & 0x00FF0000) >> 8) |  
+               ((value & 0xFF000000) >> 24) ;  
+}  
+
+
+3.浮点数字节序转换
+浮点数的内部结构相对比较复杂，但仍然可以把浮点数当作整数转换字节序，因为字节始终是字节，可以使用c++的reinterpret_cast操作把浮点数诠释为整数，这称为类型双关（type_punning），或者使用一个简便的方法是 使用union
+
+[cpp] view plain copy 在CODE上查看代码片派生到我的代码片
+union intWithFloat  
+{  
+     int32_t m_i32;  
+     float m_f32;  
+}  
+  
+float swapFloat32(float value)  
+{  
+     intWithFloat i;  
+     i.m_i32 = value;  
+     i.m_f32 = swapInt32(i.m_i32)  
+     return i.m_f32;  
+}   

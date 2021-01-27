@@ -68,11 +68,14 @@ private:
 public:
 	void StartLog(const TCHAR* pFilePath) 
 	{
-		// LOGINFO(_T("will log in %s."), pFilePath);
+#ifdef _WIN32
 		OutputDebugString(pFilePath);
-		//m_pLog = _tfopen(_T("C:\\log.txt"), _T("w"));
+		OutputDebugString(_T("\r\n"));
+#endif
+
 		m_pLog = _tfopen(pFilePath, _T("w+"));
 		//_tfopen_s(&m_pLog, pFilePath, _T("w+"));
+
 		assert(m_pLog);
 
 		LogTime();
@@ -209,22 +212,17 @@ extern CLogFile* g_pLogFile; //= &theLogFile;
 #define LOGFUNBGN		\
 	m_bDebug = true;		\
 	if(g_bDebug && m_bDebug) {	\
-		LOGOUT(__FUNCTION__);		\
-		LOGOUT("\nLine: %d", __LINE__);		\
-		LOGOUT(_T(" is to start.\n"));	\
+		LOGOUT("INFO:\tL%d, %s is to start.\n", __LINE__, __FUNCTION__);		\
 	}
 
 #define LOGFUNEND		\
 	if(g_bDebug && m_bDebug) {	\
-		LOGOUT(__FUNCTION__);	\
-		LOGOUT(_T(" is finished.\n"));		\
+		LOGOUT("INFO:\t%s is finished.\n", __FUNCTION__);		\
 	}
 
 #define LOGFUNMSG		\
 	if(g_bDebug) {		\
-		LOGOUT(__FUNCTION__);	\
-		LOGOUT("\nLine: %d", __LINE__);		\
-		LOGOUT("\n");		\
+		LOGOUT("Line: %d, %s\n", __LINE__, __FUNCTION__);		\
 	}
 	
 #define LOGINFO(tInfo, ...)	\
@@ -245,7 +243,7 @@ extern CLogFile* g_pLogFile; //= &theLogFile;
 	if(g_bDebug && m_bDebug) {	\
 		LOGOUT("OK:\t");		\
 		LOGOUT(tOK, ## __VA_ARGS__);		\
-		LOGOUT("\n\n");		\
+		LOGOUT("\n");		\
 	}
 
 #define VOK(b) 	\

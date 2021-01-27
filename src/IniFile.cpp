@@ -1,5 +1,5 @@
 //************************* begin of -- include ******************************
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include "IniFile.h"
 //#include "LogFile.h"
@@ -39,7 +39,7 @@ CIniFile::~CIniFile() {
  *------------------------------------------------------------------------------
  * param: char *tszfile  -- file to open
  *------------------------------------------------------------------------------
- * return: 0  -- file succefully opened
+ * return: 0  -- file successfully opened
  *	-1  -- fail to open ini file
  *	-2  -- fail to read file to buffer
  *	-3	-- fail to close last file
@@ -78,8 +78,10 @@ int CIniFile::OpenFile(const TCHAR* tszfile)
 	{
 		//LOGINFO(_T("Line£º%s"), tszLine);
 
-		_tcscpy(tszLine, _tcstrim(tszLine));	//trim bank in head and tail
+		// _tcscpy(tszLine, _tcstrim(tszLine));	//trim bank in head and tail
+		_tcscpy(tszLine, _tcstrimAll(tszLine));	//trim bank in head and tail, middle
 		//if(_tcscmp(tszLine[0], _T('[')) == 0)
+		OutputDebugString(tszLine);
 		if(tszLine[0] == _T('['))
 		{
 			//tszLine = Mid(tszLine, 1, _tcslen(tszLine)-2);
@@ -96,11 +98,14 @@ int CIniFile::OpenFile(const TCHAR* tszfile)
 			tszKey = _tcstok(tszLine, _T("="));
 			tszValue = _tcstok(NULL, _T("="));
 
-			if (tszValue == NULL)	tszValue = _T("");
-			_tcscpy(tszKey, _tcstrim(tszKey));
-			_tcscpy(tszValue, _tcstrim(tszValue));
+			if (NULL == tszValue)	tszValue = _T("");
+			if (NULL == tszKey) continue;
+			// _tcscpy(tszKey, _tcstrim(tszKey));
+			_tcscpy(tszKey, _tcstrimAll(tszKey));
+			// _tcscpy(tszValue, _tcstrim(tszValue));
+			_tcscpy(tszValue, _tcstrimAll(tszValue));
 			m_mapData[tSection][tszKey] = tszValue;
-			//LOGINFO(_T("tszKey: %s,\t tszValue: %s"), tszKey, tszValue);
+			OutputDebugString(_T("tszKey: %s,\t tszValue: %s, tszKey, tszValue"));
 		}
 	}
 	// LOGFUNEND;
@@ -241,7 +246,7 @@ bool CIniFile::SetString(const TCHAR* section, const TCHAR* key, const TCHAR* va
 }
 
 /*******************************************************************************
- *  desc: get a interger value by key
+ *  desc: get a integer value by key
  *------------------------------------------------------------------------------
  * param: const TCHAR* section -- section name
  *   const TCHAR* key   -- key name
@@ -261,7 +266,7 @@ int CIniFile::GetInteger(const TCHAR* section, const TCHAR* key, int default_val
 }
 
 /*******************************************************************************
- *  desc: set a interger value
+ *  desc: set a integer value
  *------------------------------------------------------------------------------
  * param: const TCHAR* section -- section name
  *   const TCHAR* key   -- key name
@@ -355,7 +360,7 @@ bool CIniFile::SetDouble(const TCHAR* section, const TCHAR* key, const double va
 }
 
 /*******************************************************************************
- *  desc: get a bool value by key
+ *  desc: get a boolean value by key
  *------------------------------------------------------------------------------
  * param: const TCHAR* section -- section name
  *   const TCHAR* key   -- key name
@@ -381,10 +386,8 @@ bool CIniFile::GetBool(const TCHAR* section, const TCHAR* key, bool default_valu
 	return default_value;
 }
 
-
-
 /*******************************************************************************
- *  desc: set a bool value
+ *  desc: set a boolean value
  *------------------------------------------------------------------------------
  * param: const TCHAR* section -- section name
  *   const TCHAR* key   -- key name

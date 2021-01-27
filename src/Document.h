@@ -54,7 +54,7 @@ public:
 	void ScriptReplace(const tString script);
 	void PyScriptReplace(const tString script);
 	void Big5ToGBK();
-	size_t ReplaceAll(const tString find, const tString replacer, bool bRegExp);
+	size_t ReplaceString(tString & tStr, const tString srcStr, const tString desSrc, bool bRegExp);
 	void SetDocument(const tString tDoc){m_tDoc = tDoc;};
 
 	size_t Parse(bool bHeadIndexContent);

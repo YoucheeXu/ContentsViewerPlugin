@@ -1,30 +1,30 @@
 ## To-Do
-
-* make toolbar look better
-* focus on content of viewer
-* shortcut in toolbar of Notepad++
+* shortcut of command
 * Python script
-* hint of line number at content
 * upload to github
 * add into Plugins Admin of Notepad++
 * color content
 * mark/export miss or empty contents
-* jump back origin position after action
-* Merge paragraphs
 
 ## Known bugs
-
-* 第一千四十章 -*  第140章
-* space align doesn't work well
-
-## v0.4
-### BUG
-* 不能处理非ANSI编码文件
-* 无法删除最后一个目录    √
-* 索引目录时，“花”与“回”分不清
-* 目录空格
+* 第一千四十章 ->  第140章
+* 十 -> 十
+* it will cause reparse when close file
 * 脚本替换完无法回原来位置
-* 刷新指示段落
+
+
+## v0.5
+* focus on the cursor corresponding content of viewer		OK
+* jump back origin position of editor after action			OK
+* shortcut in toolbar of Notepad++							OK
+* hint of line number at content							OK
+* make toolbar look better									OK
+
+Bug fixed:
+* space align doesn't work well								OK
+* Merge paragraphs doesn't work								OK
+* gotoline doesn't work well								OK
+* IDM_SC_INTO_NUMBER doesn't work well						OK
 
 ### stdRep.jb
 * 删除非法字	√

@@ -15,10 +15,10 @@
 //#define _CRT_SECURE_NO_DEPRECATE
 //#endif
 #include "help.h"
-#include <stdio.h>   // for FILE
-#include <assert.h>
+#include <cstdio>   // for FILE
+#include <cassert>
 #include <map>
-#include <string>
+#include <cstring>
 #include <tchar.h>
 
 // typedef std::basic_string<TCHAR> tString;

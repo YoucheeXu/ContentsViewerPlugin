@@ -23,13 +23,16 @@
 	void operator=(const TypeName&)
 
 TCHAR* _tcstrim(TCHAR* str);
+TCHAR* _tcstrimAll(TCHAR* str);
+//TCHAR* _tcstrimLeft(const TCHAR* str);
+//TCHAR* _tcstrimRight(const TCHAR* str);
+//TCHAR* _tcstrim(const TCHAR* str);
 void StringTrimLeft(tString& str);
 void StringTrimRight(tString& str);
 void StringReplace(tString& tOrg, const TCHAR* tszFrom, const TCHAR* tszTo);
-int StringReplaceAll(tString& tOrg, const TCHAR* tszFrom, const TCHAR* tszTo, bool bRegrex = false);
-//int StringRegReplaceAll(tString& tOrig, wregex regExpress, const TCHAR* tszReplace);
+size_t StringReplaceAll(tString & tStr, const tString srcStr, const tString desStr, bool bRegExp = false);
 void StringErase(tString& tOrg, const TCHAR* tszDrop);
 int StringEraseAll(tString& tOrg, const TCHAR* tszDrop);
-bool CheckPath(TCHAR* path);
+//bool CheckPath(TCHAR* path);
 
 #endif //_HELP_H_

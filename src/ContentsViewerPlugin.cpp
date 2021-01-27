@@ -7,10 +7,14 @@ using namespace std;
 
 extern FuncItem funcItem[nbFunc];
 //extern NPPData nppData;
+#define CMD_OPENCVD 0
+
 
 // global vars
 //bool g_bDebug;
 CLogFile* g_pLogFile;
+
+//static HBITMAP s_hContentsViewerBitmap = NULL;
 
 CContentsViewerPlugin thePlugin;
 
@@ -19,6 +23,7 @@ CContentsViewerPlugin::CContentsViewerPlugin()
 	g_pLogFile = new CLogFile();
 	m_nCodePage = CP_ACP;
 	m_bDebug = false;
+	//mHTabIcon = NULL;
 }
 
 CContentsViewerPlugin::~CContentsViewerPlugin()
@@ -30,21 +35,25 @@ CContentsViewerPlugin::~CContentsViewerPlugin()
 void CContentsViewerPlugin::Initialize(HINSTANCE hInstance)
 {
 	SetResourceHandle(hInstance);
-	mHTabIcon = (HICON)::LoadImage(hInstance, 
+	m_hTabIcon = (HICON)::LoadImage(hInstance,
 		MAKEINTRESOURCE(IDB_CONTENTSVIEWER), IMAGE_ICON, 0, 0,
 		LR_LOADMAP3DCOLORS| LR_LOADTRANSPARENT);
 	//m_TB_Icon.hToolbarBmp = (HBITMAP)::LoadImage(hInstance,
 	// MAKEINTRESOURCE(IDB_TAGSVIEW), IMAGE_BITMAP, 0, 0, 
 	// LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS);
+
+	/*s_hContentsViewerBitmap = (HBITMAP)::LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP_JSONVIEW), IMAGE_BITMAP,
+		0, 0, (LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS));*/
 }
 
 void CContentsViewerPlugin::Uninitialize()
 {
-	if (mHTabIcon)
+	/*if (mHTabIcon)
 	{
 		::DestroyIcon(mHTabIcon);
 		mHTabIcon = NULL;
-	}
+	}*/
+
 	//if ( m_TB_Icon.hToolbarBmp )
 	//{
 	//    ::DeleteObject(m_TB_Icon.hToolbarBmp);
@@ -133,6 +142,14 @@ void CContentsViewerPlugin::OnNPPTBModification()
 	//g_TBHex.hToolbarBmp = (HBITMAP)::LoadImage((HINSTANCE)g_hModule, MAKEINTRESOURCE(IDB_TB_HEX), IMAGE_BITMAP, 0, 0, (LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS));
 	g_TBHex.hToolbarBmp = mHTabIcon;
 	SendNppMsg(NPPM_ADDTOOLBARICON, (WPARAM)funcItem[0]._cmdID, (LPARAM)&g_TBHex);*/
+
+	//HWND hNppToolbar = NppToolbarHandleGetter::get();
+
+	UINT style = (LR_SHARED | LR_LOADTRANSPARENT | LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS);
+	m_tbiJS.hToolbarBmp = (HBITMAP)::LoadImage(GetInstanceHandle(), MAKEINTRESOURCE(IDB_CONTENTSVIEWER), IMAGE_BITMAP, 0, 0, style);;
+	//tbiJS.hToolbarIcon = m_hTabIcon;
+	SendNPPMsg(NPPM_ADDTOOLBARICON, (WPARAM)funcItem[CMD_OPENCVD]._cmdID, (LPARAM)&m_tbiJS);
+	//SendNPPMsg(NPPM_ADDTOOLBARICON, (WPARAM)funcItem[5]._cmdID, (LPARAM)&m_hTabIcon);
 }
 
 //NPPN_READY
@@ -181,7 +198,7 @@ void CContentsViewerPlugin::GotoLine(int line)
 
 	//::SendMessage(hSciEdit, SCI_ENSUREVISIBLE, line - 1, 0);
 
-	LOGOUT("DesLine: %d\n", line);
+	//LOGOUT("DesLine: %d\n", line);
 	
 	int curLineNo = GetCurLineNo();
 	LOGOUT("curLineNo: %d\n", curLineNo);
@@ -198,7 +215,6 @@ void CContentsViewerPlugin::GotoLine(int line)
 	{
 		desLine = line - linesOnScreen / 2;
 	}
-	//This removes any selection and sets the caret at the start of line number line and scrolls the view (if needed) to make it visible. The anchor position is set the same as the current position. If line is outside the lines in the document (first line is 0), the line set is the first or last.
 	::SendMessage(hSciEdit, SCI_GOTOLINE, desLine, 0);
 
 	////These messages retrieve and set the line number of the first visible line in the Scintilla view. The first line in the document is numbered 0. The value is a visible line rather than a document line.
@@ -207,6 +223,9 @@ void CContentsViewerPlugin::GotoLine(int line)
 
 	//This will attempt to scroll the display by the number of columns and lines that you specify. Positive line values increase the line number at the top of the screen (i.e. they move the text upwards as far as the user is concerned), Negative line values do the reverse.
 	//::SendMessage(hSciEdit, SCI_LINESCROLL, 0, firstLine);
+
+	//::SendMessage(hSciEdit, SCI_ENSUREVISIBLE, line - 1, 0);
+	//::SendMessage(hSciEdit, SCI_GOTOLINE, line - 1, 0);
 
 	::SendMessage(hSciEdit, WM_SETREDRAW, (WPARAM) TRUE, 0);
 	::InvalidateRect(hSciEdit, NULL, TRUE);
@@ -252,12 +271,12 @@ void CContentsViewerPlugin::ReplaceLine(int line, const TCHAR* tszTxt)
 	string sLine = TtoA(tszTxt, m_nCodePage);
 	char* szLine = const_cast<char*>(sLine.c_str());
 
-	int currentPos = ::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line - 1, 0);
+	int startPos = ::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line - 1, 0);
 	//int currentPos = ::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line + 1, 0);
 	unsigned int len = ::SendMessage(hSciEdit, SCI_GETLINE, line - 1, 0);
-	int anchorPos = currentPos + len;
-	LOGINFO(_T("currentPos = %d, anchorPos = %d"), currentPos, anchorPos);
-	::SendMessage(hSciEdit, SCI_SETSEL, anchorPos, currentPos);
+	int endPos = startPos + len;
+	LOGINFO(_T("startPos = %d, endPos = %d"), startPos, endPos);
+	::SendMessage(hSciEdit, SCI_SETSEL, endPos, startPos);
 	//MessageBox(NULL, _T("haha!"), _T(""), MB_OK);
 	::SendMessage(hSciEdit, SCI_REPLACESEL, 0, (LPARAM)szLine);
 	LOGFUNEND;
@@ -326,7 +345,7 @@ int CContentsViewerPlugin::IndexContents(const TCHAR* tText, const TCHAR* tszKey
 		if(pos != -1)
 		{
 			i++;
-			LOGINFO(_T("Content is found at: %d"), pos);
+			//LOGINFO(_T("Content is found at Pos: %d\n"), pos);
 			int line = ::SendMessage(hSciEdit, SCI_LINEFROMPOSITION, pos, 0);
 
 			unsigned int len = ::SendMessage(hSciEdit, SCI_GETLINE, line, 0);
@@ -338,8 +357,8 @@ int CContentsViewerPlugin::IndexContents(const TCHAR* tText, const TCHAR* tszKey
 
 			tContent = AtoT(chText, m_nCodePage);
 
-			LOGINFO(_T("Length of %s be cuted : %u"), tContent.c_str(), tContent.size());
-
+			StringTrimLeft(tContent);
+			StringTrimRight(tContent);
 			mCVDlg.AddContent(i, tContent.c_str(), line + 1, level, tszKeyword);
 			delete [] chText;
 
@@ -692,10 +711,10 @@ void commandMenuInit()
 	//            bool check0nInit                // optional. Make this menu item be checked visually
 	//            );
 	ShortcutKey *sk = new ShortcutKey();
-	sk->_isAlt = TRUE;
-	sk->_isCtrl = TRUE;
-	sk->_isShift = TRUE;
-	sk->_key = 0x4A;
+	sk->_isAlt = true;
+	sk->_isCtrl = true;
+	sk->_isShift = false;
+	sk->_key = 'C';
 	setCommand(0, TEXT("Show &Contents Viewer"), openContentsViewerDlg, sk, false);
 	setCommand(1, TEXT("&About"), openAboutDlg, NULL, false);
 }

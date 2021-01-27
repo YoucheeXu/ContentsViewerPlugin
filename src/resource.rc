@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include <windows.h>
 #include "resource.h"
+#include <windows.h>
 /////////////////////////////////////////////////////////////////////////////
 // Chinese (Simplified, PRC) resources
 
@@ -58,7 +58,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "插入目录\tShift + Ctrl+&I",       IDM_INSERT_CONTENTS_BEFORE
         MENUITEM SEPARATOR
-        MENUITEM "选择\tShift + Ctrl+&L",         	IDM_SELECT_CONTENTS
+        MENUITEM "选择\tShift + Ctrl+&L",         IDM_SELECT_CONTENTS
     END
 END
 
@@ -72,15 +72,15 @@ BEGIN
         MENUITEM "导入目录...*",                    IDM_IMPORT_CONTENTS
         POPUP "标准化目录*"
         BEGIN
-            MENUITEM "转换目录为半角数字",        	IDM_SC_INTO_NUMBER
-            MENUITEM "对齐目录数字*",          		IDM_SC_ALIGN_NUMBER
-            MENUITEM "规整目录空格",             	IDM_SC_TRIM_CONTENTS
-            MENUITEM "排序目录*",                	IDM_SC_SORT_CONTENTS
-            MENUITEM "删除重复目录",            	IDM_SC_DEL_DUPLICATECONTENTS
-            MENUITEM "标记空目录",               	IDM_SC_MARK_EMPTYCONTENTS
+            MENUITEM "转换目录为半角数字",                   IDM_SC_INTO_NUMBER
+            MENUITEM "对齐目录数字*",                     IDM_SC_ALIGN_NUMBER
+            MENUITEM "规整目录空格",                      IDM_SC_TRIM_CONTENTS
+            MENUITEM "排序目录*",                       IDM_SC_SORT_CONTENTS
+            MENUITEM "删除重复目录",                      IDM_SC_DEL_DUPLICATECONTENTS
+            MENUITEM "标记空目录",                       IDM_SC_MARK_EMPTYCONTENTS
         END
         MENUITEM SEPARATOR
-        MENUITEM "繁体转简体*",                  	IDM_BIG5_GBK
+        MENUITEM "繁体转简体*",                      IDM_BIG5_GBK
         MENUITEM SEPARATOR
         MENUITEM "合并段落",                        IDM_MERGE_PARAGRAPHS
         MENUITEM "规整段落",                        IDM_ALIGN_PARAGRAPHS
@@ -108,20 +108,20 @@ END
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040901b5"
+        BLOCK "080401b5"
         BEGIN
             VALUE "FileDescription", "ContentsViewer"
-            VALUE "FileVersion", "0.3.5"
+            VALUE "FileVersion", "0.5.0"
             VALUE "InternalName", "ContentsViewer"
             VALUE "OriginalFilename", "ContentsViewerPlugin.dll"
             VALUE "ProductName", "ContentsViewer plugin for Notepad++"
-            VALUE "ProductVersion", "0.3.5"
+            VALUE "ProductVersion", "0.5.0"
             VALUE "SpecialBuild", "UNICODE"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 437
+        VALUE "Translation", 0x804, 437
     END
 END
 
@@ -132,7 +132,6 @@ END
 //
 
 IDB_CONTENTSVIEWER      BITMAP                  "res\\ContentsViewer.bmp"
-
 IDB_TOOLBAR             BITMAP                  "res\\Toolbar.bmp"
 
 
@@ -188,40 +187,12 @@ END
 STRINGTABLE
 BEGIN
     IDB_PREVPOS             "Navigate Backward"
-END
-
-STRINGTABLE
-BEGIN
     IDB_NEXTPOS             "Navigate Forward"
-END
-
-STRINGTABLE
-BEGIN
     IDB_SCRIPT_MENU         "Script Menu"
-END
-
-STRINGTABLE
-BEGIN
     IDB_PYSCRIPT_MENU       "PyScript Menu"
-END
-
-STRINGTABLE
-BEGIN
     IDB_VIEWLIST            "View as List"
-END
-
-STRINGTABLE
-BEGIN
     IDB_VIEWTREE            "View as Tree"
-END
-
-STRINGTABLE
-BEGIN
     IDB_PARSE               "Parse"
-END
-
-STRINGTABLE
-BEGIN
     IDB_EXTRA_MENU          "Extra Menu"
 END
 
