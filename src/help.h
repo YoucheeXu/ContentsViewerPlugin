@@ -14,7 +14,7 @@
 #include <tchar.h>
 #include <regex>
 #include "LogFile.h"
-#include "..\third-party\Win32xx_860/include/wxx_wincore.h"
+#include "Win32xx_860/include/wxx_wincore.h"
 
 // 禁止使用拷贝构造函数和 operator= 赋值操作的宏
 // 应该类的 private: 中使用

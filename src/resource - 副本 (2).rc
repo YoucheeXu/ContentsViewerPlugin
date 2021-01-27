@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include <windows.h>
 #include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // Chinese (Simplified, PRC) resources
 
@@ -35,7 +35,7 @@ BEGIN
 END
 
 IDD_CVDLG DIALOGEX 0, 0, 192, 199
-STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_SETFONT | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Contents Viewer"
 FONT 8, "Ms Shell Dlg", 0, 0, 0x1
@@ -72,15 +72,15 @@ BEGIN
         MENUITEM "导入目录...*",                    IDM_IMPORT_CONTENTS
         POPUP "标准化目录*"
         BEGIN
-            MENUITEM "转换目录为半角数字",        	IDM_SC_INTO_NUMBER
-            MENUITEM "对齐目录数字*",          		IDM_SC_ALIGN_NUMBER
-            MENUITEM "规整目录空格",             	IDM_SC_TRIM_CONTENTS
-            MENUITEM "排序目录*",                	IDM_SC_SORT_CONTENTS
-            MENUITEM "删除重复目录",            	IDM_SC_DEL_DUPLICATECONTENTS
-            MENUITEM "标记空目录",               	IDM_SC_MARK_EMPTYCONTENTS
+            MENUITEM "转换目录为半角数字",                   IDM_SC_INTO_NUMBER
+            MENUITEM "对齐目录数字*",                     IDM_SC_ALIGN_NUMBER
+            MENUITEM "规整目录空格",                      IDM_SC_TRIM_CONTENTS
+            MENUITEM "排序目录*",                       IDM_SC_SORT_CONTENTS
+            MENUITEM "删除重复目录",                      IDM_SC_DEL_DUPLICATECONTENTS
+            MENUITEM "标记空目录",                       IDM_SC_MARK_EMPTYCONTENTS
         END
         MENUITEM SEPARATOR
-        MENUITEM "繁体转简体*",                  	IDM_BIG5_GBK
+        MENUITEM "繁体转简体*",                     IDM_BIG5_GBK
         MENUITEM SEPARATOR
         MENUITEM "合并段落",                        IDM_MERGE_PARAGRAPHS
         MENUITEM "规整段落",                        IDM_ALIGN_PARAGRAPHS
@@ -102,7 +102,7 @@ END
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS 0x40004L
+ FILEOS 0x4L
  FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
@@ -130,8 +130,6 @@ END
 //
 // Bitmap
 //
-
-IDB_CONTENTSVIEWER      BITMAP                  "res\\ContentsViewer.bmp"
 
 IDB_TOOLBAR             BITMAP                  "res\\Toolbar.bmp"
 
@@ -178,6 +176,17 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_CVDLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -12,11 +12,9 @@ taskkill /F /IM notepad++.exe
 
 @cd /d %~dp0
 @REM copy /y ContentsViewerPlugin.dll %ProgramFiles%\Notepad++\plugins\
-@REM copy /y ContentsViewerPlugin.dll C:\"Program Files"\"Notepad++"\plugins
 copy /y ContentsViewerPlugin.dll "%ProgramFiles(x86)%"\"Notepad++"\plugins\ContentsViewerPlugin
 
-@rem copy /y ContentsViewerPlugin.ini C:\"Program Files"\"Notepad++"\plugins\Config
-@rem xcopy /y .\ContentsViewerPlugin %appdata%\"Notepad++"\plugins\Config
+xcopy /s /y /I /F ContentsViewerPlugin %appdata%\"Notepad++"\plugins\Config\ContentsViewerPlugin
 
 @rem ping -n 6 127.1 
 

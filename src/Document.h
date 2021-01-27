@@ -28,10 +28,13 @@ public :
 	
 private:
 	DISALLOW_COPY_AND_ASSIGN(CDocument);
-	
-protected:
-	void ClearmapContent();
+
+private:
 	size_t LineFromPos(size_t pos);
+
+public:
+	void ClearmapContent();
+
 	size_t IndexContents(const TCHAR* tszText, const TCHAR* tszKeyword, int level);
 
 	void DelLine(int line);
@@ -42,17 +45,17 @@ protected:
 	size_t GetLineCount();
 	size_t GetCurLineNo();
 
-public:
 	void SetParameters(const size_t ulineBetweenParagraphs, const TCHAR* tszNum, const size_t uCountX, const TCHAR* tszKeyword);
 	//void SetParameters(const size_t ulineBetweenParagraphs, const TCHAR tszNum[], const size_t uCountX, const TCHAR tszKeyword[]);
 
-	bool GetDocument(tString &tDoc){tDoc = m_tDoc;};
+	void GetDocument(tString &tDoc){tDoc = m_tDoc;};
 	void MergeParagraphs();
 	void AlignParagraphs();
 	void ScriptReplace(const tString script);
+	void PyScriptReplace(const tString script);
 	void Big5ToGBK();
 	size_t ReplaceAll(const tString find, const tString replacer, bool bRegExp);
-	bool SetDocument(const tString tDoc){m_tDoc = tDoc;};
+	void SetDocument(const tString tDoc){m_tDoc = tDoc;};
 
 	size_t Parse(bool bHeadIndexContent);
 	void TrimContents();

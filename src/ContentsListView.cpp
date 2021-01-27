@@ -43,7 +43,7 @@ LRESULT CContentsListView::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//case VK_ESCAPE: //m_pDlg->m_edFilter.DirectMessage(uMsg, wParam, lParam);
 			case VK_DELETE:
 				OnDelContents();
-				thePlugin.ReparseCurFile();
+				thePlugin.ReParseCurFile();
 				break;
 
 			case VK_UP:
@@ -174,7 +174,7 @@ void CContentsListView::OnLMouseUp(UINT nFlags, CPoint point)
 		{
 			thePlugin.CutLines(mMoveLineStart, mMoveLineEnd);
 			thePlugin.PasteBeforeLine(line);
-			thePlugin.ReparseCurFile();
+			thePlugin.ReParseCurFile();
 		}
 		
 		//}
@@ -437,7 +437,7 @@ void CContentsListView::OnInsetContentsBefore()
 	int line = GetLineByItem(iItem);
 
 	thePlugin.PasteBeforeLine(line);
-	thePlugin.ReparseCurFile();
+	thePlugin.ReParseCurFile();
 	LOGFUNEND;
 }
 //wait to test

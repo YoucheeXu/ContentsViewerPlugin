@@ -3,7 +3,7 @@
 #define CONTENTSLISTVIEW_H
 
 #include "help.h"
-#include "..\third-party\Win32xx_860\include\wxx_listview.h"
+#include "Win32xx_860\include\wxx_listview.h"
 //#include "win32++/include/frame.h"
 
 #include "resource.h"

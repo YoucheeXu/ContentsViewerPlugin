@@ -1,5 +1,6 @@
 #include "ContentsViewerPlugin.h"
 #include <regex>
+#include "resource.h"
 
 using namespace regex_constants;
 using namespace std;
@@ -98,7 +99,8 @@ void CContentsViewerPlugin::OnFileActivated()
 {
 	if (IsCVDlgExist())
 	{
-		if (IsCVDlgVisable()) thePlugin.ReparseCurFile();
+		//if(IsCVDlgVisable()) thePlugin.ReParseCurFile();
+		if(IsCVDlgVisable()) ParseCurFile();
 	}
 }
 
@@ -113,7 +115,7 @@ void CContentsViewerPlugin::OnFileOpened()
 	/*if (IsCVDlgExist())
 	{
 		if (IsCVDlgVisable())
-			thePlugin.ReparseCurFile();
+			thePlugin.ReParseCurFile();
 	}*/
 }
 
@@ -171,41 +173,39 @@ void CContentsViewerPlugin::GotoLine(int line)
 
 	const HWND hSciEdit = GetEditHWnd();
 	if(NULL == hSciEdit) return;
-	//int pos = (int)::SendMessage(hSciEdit, SCI_POSITIONFROMLINE, line, 0);
 
-	//const int line = (int) ::SendMessage(hSciEdit, SCI_LINEFROMPOSITION, selStart, 0);
 	::SendMessage(hSciEdit, WM_SETREDRAW, (WPARAM) FALSE, 0);
 
-	//SCI_SETSEL(int anchorPos, int currentPos)
 	//This message sets both the anchor and the current position. If currentPos is negative, it means the end of the document. If anchorPos is negative, it means remove any selection (i.e. set the anchor to the same position as currentPos). The caret is scrolled into view after this operation.
 	//::SendMessage(hSciEdit, SCI_SETSEL, selStart, selEnd);
 
-	//This removes any selection and sets the caret at the start of line number line and scrolls the view (if needed) to make it visible. The anchor position is set the same as the current position. If line is outside the lines in the document (first line is 0), the line set is the first or last.
-	//if(line >= 5) line = line - 5;
-	//line = line + 5;
-	//::SendMessage(hSciEdit, SCI_GOTOLINE, line + 1, 0);
-	/*::SendMessage(hSciEdit, SCI_GOTOLINE, line, 0);
-	//::SendMessage(hSciEdit, SCI_LINESCROLL, 0, line);
-	//::SendMessage(hSciEdit, SCI_GOTOPOS, pos, 0);
+	//::SendMessage(hSciEdit, SCI_ENSUREVISIBLE, line - 1, 0);
 
-	int currentLine = GetCurLine();
+	LOGOUT("DesLine: %d\n", line);
 	
-	::SendMessage(hSciEdit, SCI_GOTOLINE, line * 2 - currentLine, 0);*/
-	::SendMessage(hSciEdit, SCI_ENSUREVISIBLE, line - 1, 0);
-	::SendMessage(hSciEdit, SCI_GOTOLINE, line - 1, 0);
+	int curLineNo = GetCurLineNo();
+	LOGOUT("curLineNo: %d\n", curLineNo);
+	//int firstVisibleLine = 0;
+	auto linesOnScreen = 0;
+	int desLine = 0;
+	linesOnScreen = (int)::SendMessage(hSciEdit, SCI_LINESONSCREEN, 0, 0);
+	LOGOUT("linesOnScreen: %d\n", linesOnScreen);
+	if (curLineNo < line)
+	{
+		desLine = linesOnScreen / 2 + line;
+	}
+	else
+	{
+		desLine = line - linesOnScreen / 2;
+	}
+	//This removes any selection and sets the caret at the start of line number line and scrolls the view (if needed) to make it visible. The anchor position is set the same as the current position. If line is outside the lines in the document (first line is 0), the line set is the first or last.
+	::SendMessage(hSciEdit, SCI_GOTOLINE, desLine, 0);
 
 	////These messages retrieve and set the line number of the first visible line in the Scintilla view. The first line in the document is numbered 0. The value is a visible line rather than a document line.
-	//int firstLine = (int)::SendMessage(hSciEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-	//if (firstLine < line)
-	//{
-	//	firstLine = line - firstLine + 5;
-	//	::SendMessage(hSciEdit, SCI_LINESCROLL, 0, firstLine);
-	//}
-	//else
-	//	firstLine = -2;
+	//int firstVisibleLine = ::SendMessage(hSciEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
+	//::SendMessage(hSciEdit, SCI_SETFIRSTVISIBLELINE, desLine, 0);
 
 	//This will attempt to scroll the display by the number of columns and lines that you specify. Positive line values increase the line number at the top of the screen (i.e. they move the text upwards as far as the user is concerned), Negative line values do the reverse.
-	//The column measure is the width of a space in the default style. Positive values increase the column at the left edge of the view (i.e. they move the text leftwards as far as the user is concerned). Negative values do the reverse.
 	//::SendMessage(hSciEdit, SCI_LINESCROLL, 0, firstLine);
 
 	::SendMessage(hSciEdit, WM_SETREDRAW, (WPARAM) TRUE, 0);
@@ -263,12 +263,22 @@ void CContentsViewerPlugin::ReplaceLine(int line, const TCHAR* tszTxt)
 	LOGFUNEND;
 }
 
-void CContentsViewerPlugin::ReparseCurFile()
+void CContentsViewerPlugin::ParseCurFile()
+{
+	//LOGINFO(_T("CContentsViewerPlugin::ParseCurFile()"));
+	//mCVDlg.OnParse();
+	mCVDlg.ParseCurFile();
+	mCVDlg.UpdateContentListview();
+}
+
+void CContentsViewerPlugin::ReParseCurFile()
 {
 	LOGFUNBGN;
-	LOGINFO(_T("CContentsViewerPlugin::ReparseCurFile()"));
-	mCVDlg.ReparseCurFile();
+	LOGINFO(_T("CContentsViewerPlugin::ReParseCurFile()"));
+	//mCVDlg.ReParseCurFile();
 	//mCVDlg.ParseCurFile();
+	mCVDlg.ParseCurFile();
+	mCVDlg.UpdateContentListview();
 	LOGFUNEND;
 }
 
@@ -581,10 +591,11 @@ TCHAR* CContentsViewerPlugin::GetNPPDirectory()
 
 TCHAR* CContentsViewerPlugin::GetPluginsConfigDir()
 {
-	TCHAR pluginsConfDir[MAX_PATH];
+	// TCHAR pluginsConfDir[MAX_PATH];
+	char pluginsConfDir[MAX_PATH];
 	SendNPPMsg(NPPM_GETPLUGINSCONFIGDIR, (WPARAM)MAX_PATH, (LPARAM)pluginsConfDir);
 	LOGINFO(_T("pluginsConfDir: %s"), pluginsConfDir);
-	return pluginsConfDir;
+	return (TCHAR*)pluginsConfDir;
 }
 
 void CContentsViewerPlugin::SaveCurFile()
@@ -723,7 +734,7 @@ void openContentsViewerDlg()
 	static tTbData dockData;
 	static TCHAR szPluginName[64];
 
-	bool bParseFile = false;
+	//bool bParseFile = false;
 
 	if (thePlugin.IsCVDlgExist())
 	{
@@ -733,16 +744,15 @@ void openContentsViewerDlg()
 		{
 			uMsg = NPPM_DMMHIDE;
 			bCheck = FALSE;
-			bParseFile = true;
+			//bParseFile = true;
 		}
 
 		//show the dialog
 		thePlugin.SendNPPMsg(uMsg, 0, (LPARAM) dockData.hClient );
 		//set the check on menu item
 		//thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, 
-		//  CContentsViewerDialog::FUNC_ARRAY[CContentsViewerDialog::EFI_TAGSVIEW]._cmdID,
-		//  bCheck );
-		thePlugin.SendNPPMsg( NPPM_SETMENUITEMCHECK, funcItem[0]._cmdID,  bCheck);
+		//CContentsViewerDialog::FUNC_ARRAY[CContentsViewerDialog::EFI_TAGSVIEW]._cmdID, bCheck );
+		thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, funcItem[0]._cmdID,  bCheck);
 	}
 	else
 	{
@@ -764,23 +774,23 @@ void openContentsViewerDlg()
 		dockData.pszModuleName = NPP_PLUGIN_NAME;
 
 		//set dialog dockable
-		thePlugin.SendNPPMsg( NPPM_DMMREGASDCKDLG, 0, (LPARAM) &dockData );
+		thePlugin.SendNPPMsg(NPPM_DMMREGASDCKDLG, 0, (LPARAM) &dockData);
 		//register dialog
-		thePlugin.SendNPPMsg( NPPM_MODELESSDIALOG, MODELESSDIALOGADD, (LPARAM) dockData.hClient );
+		thePlugin.SendNPPMsg(NPPM_MODELESSDIALOG, MODELESSDIALOGADD, (LPARAM) dockData.hClient);
 		//show the dialog
-		thePlugin.SendNPPMsg( NPPM_DMMSHOW, 0, (LPARAM) dockData.hClient );
+		thePlugin.SendNPPMsg(NPPM_DMMSHOW, 0, (LPARAM) dockData.hClient);
 		//set the check on menu item
-		//thePlugin.SendNPPMsg( NPPM_SETMENUITEMCHECK, 
-		//  CContentsViewerDialog::FUNC_ARRAY[CContentsViewerDialog::EFI_TAGSVIEW]._cmdID,
-		//  TRUE );
+		//thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, 
+		//CContentsViewerDialog::FUNC_ARRAY[CContentsViewerDialog::EFI_TAGSVIEW]._cmdID, TRUE);
 		thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, funcItem[0]._cmdID, TRUE);
 	}
 
-	if (bParseFile)
-	{
-		//theLogFile.LogOutA(__FUNCTION__);
-		thePlugin.ReparseCurFile();
-	}
+	//if (bParseFile)
+	//{
+	//	//theLogFile.LogOutA(__FUNCTION__);
+	//	thePlugin.ReParseCurFile();
+	//}
+	thePlugin.ParseCurFile();
 }
 
 void openAboutDlg()
@@ -849,6 +859,7 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification *pscn)
 			thePlugin.OnNPPReady();
 			break;
 		}
+		//LOGOUT("Notification code: %d\n", pscn->nmhdr.code);
 	}
 	else
 	{

@@ -1,13 +1,9 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include <windows.h>
+#include <commctrl.h>
+#include <richedit.h>
 #include "resource.h"
-/////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-#pragma code_page(936)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -35,14 +31,14 @@ BEGIN
 END
 
 IDD_CVDLG DIALOGEX 0, 0, 192, 199
-STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_3DLOOK | DS_SHELLFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Contents Viewer"
-FONT 8, "Ms Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,2,18,188,154
-END
-
+FONT 8, "Ms Shell Dlg", 0, 0, 1
+{
+    //EDITTEXT        IDC_ED_FILTER, 2, 24, 188, 14, ES_AUTOHSCROLL
+    CONTROL         "", IDC_LISTVIEW, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHOWSELALWAYS | LVS_REPORT, 2, 18, 188, 154
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -53,12 +49,12 @@ IDM_CONTEXT_CONTENT MENU
 BEGIN
     POPUP "1"
     BEGIN
-        MENUITEM "删除目录\tShift + Ctrl+&D",       IDM_DEL_CONTENTS
-        MENUITEM "剪切目录\tShift + Ctrl + X",      IDM_CUT_CONTENTS
+        MENUITEM "删除目录\tShift + Ctrl+&D",		IDM_DEL_CONTENTS
+        MENUITEM "剪切目录\tShift + Ctrl + X",		IDM_CUT_CONTENTS
         MENUITEM SEPARATOR
-        MENUITEM "插入目录\tShift + Ctrl+&I",       IDM_INSERT_CONTENTS_BEFORE
+        MENUITEM "插入目录\tShift + Ctrl+&I",		IDM_INSERT_CONTENTS_BEFORE
         MENUITEM SEPARATOR
-        MENUITEM "选择\tShift + Ctrl+&L",         	IDM_SELECT_CONTENTS
+        MENUITEM "选择\tShift + Ctrl+&L",			IDM_SELECT_CONTENTS
     END
 END
 
@@ -66,27 +62,26 @@ IDM_EXTRA MENU
 BEGIN
     POPUP "1"
     BEGIN
-        MENUITEM "顶头索引",                        IDM_HEAD_INDEX_CONTENTS
+        MENUITEM "顶头索引",							IDM_HEAD_INDEX_CONTENTS
         MENUITEM SEPARATOR
-        MENUITEM "导出目录...*",                    IDM_EXPORT_CONTENTS
-        MENUITEM "导入目录...*",                    IDM_IMPORT_CONTENTS
+        MENUITEM "导出目录...*",						IDM_EXPORT_CONTENTS
+        MENUITEM "导入目录...*",						IDM_IMPORT_CONTENTS
         POPUP "标准化目录*"
         BEGIN
-            MENUITEM "转换目录为半角数字",        	IDM_SC_INTO_NUMBER
-            MENUITEM "对齐目录数字*",          		IDM_SC_ALIGN_NUMBER
-            MENUITEM "规整目录空格",             	IDM_SC_TRIM_CONTENTS
-            MENUITEM "排序目录*",                	IDM_SC_SORT_CONTENTS
-            MENUITEM "删除重复目录",            	IDM_SC_DEL_DUPLICATECONTENTS
-            MENUITEM "标记空目录",               	IDM_SC_MARK_EMPTYCONTENTS
+            MENUITEM "转换目录为半角数字",			IDM_SC_INTO_NUMBER
+            MENUITEM "对齐目录数字*",				IDM_SC_ALIGN_NUMBER
+            MENUITEM "规整目录空格",					IDM_SC_TRIM_CONTENTS
+            MENUITEM "排序目录*",					IDM_SC_SORT_CONTENTS
+            MENUITEM "删除重复目录",					IDM_SC_DEL_DUPLICATECONTENTS
+            MENUITEM "标记空目录",					IDM_SC_MARK_EMPTYCONTENTS
         END
         MENUITEM SEPARATOR
-        MENUITEM "繁体转简体*",                  	IDM_BIG5_GBK
+        MENUITEM "繁体转简体*",						IDM_BIG5_GBK
         MENUITEM SEPARATOR
-        MENUITEM "合并段落",                        IDM_MERGE_PARAGRAPHS
-        MENUITEM "规整段落",                        IDM_ALIGN_PARAGRAPHS
+        MENUITEM "合并段落",							IDM_MERGE_PARAGRAPHS
+        MENUITEM "规整段落",							IDM_ALIGN_PARAGRAPHS
     END
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -102,7 +97,7 @@ END
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS 0x40004L
+ FILEOS 0x4L
  FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
@@ -132,53 +127,7 @@ END
 //
 
 IDB_CONTENTSVIEWER      BITMAP                  "res\\ContentsViewer.bmp"
-
 IDB_TOOLBAR             BITMAP                  "res\\Toolbar.bmp"
-
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_ABOUTDLG, DIALOG
-    BEGIN
-    END
-
-    IDD_CVDLG, DIALOG
-    BEGIN
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -186,57 +135,13 @@ END
 //
 
 STRINGTABLE
-BEGIN
+{
     IDB_PREVPOS             "Navigate Backward"
-END
-
-STRINGTABLE
-BEGIN
     IDB_NEXTPOS             "Navigate Forward"
-END
-
-STRINGTABLE
-BEGIN
     IDB_SCRIPT_MENU         "Script Menu"
-END
-
-STRINGTABLE
-BEGIN
     IDB_PYSCRIPT_MENU       "PyScript Menu"
-END
-
-STRINGTABLE
-BEGIN
     IDB_VIEWLIST            "View as List"
-END
-
-STRINGTABLE
-BEGIN
     IDB_VIEWTREE            "View as Tree"
-END
-
-STRINGTABLE
-BEGIN
     IDB_PARSE               "Parse"
-END
-
-STRINGTABLE
-BEGIN
     IDB_EXTRA_MENU          "Extra Menu"
-END
-
-#endif    // Chinese (Simplified, PRC) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-
+}

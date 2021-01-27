@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include <windows.h>
 #include "resource.h"
+#include <windows.h>
 /////////////////////////////////////////////////////////////////////////////
 // Chinese (Simplified, PRC) resources
 
@@ -72,15 +72,15 @@ BEGIN
         MENUITEM "导入目录...*",                    IDM_IMPORT_CONTENTS
         POPUP "标准化目录*"
         BEGIN
-            MENUITEM "转换目录为半角数字",        	IDM_SC_INTO_NUMBER
-            MENUITEM "对齐目录数字*",          		IDM_SC_ALIGN_NUMBER
-            MENUITEM "规整目录空格",             	IDM_SC_TRIM_CONTENTS
-            MENUITEM "排序目录*",                	IDM_SC_SORT_CONTENTS
-            MENUITEM "删除重复目录",            	IDM_SC_DEL_DUPLICATECONTENTS
-            MENUITEM "标记空目录",               	IDM_SC_MARK_EMPTYCONTENTS
+            MENUITEM "转换目录为半角数字",                   IDM_SC_INTO_NUMBER
+            MENUITEM "对齐目录数字*",                     IDM_SC_ALIGN_NUMBER
+            MENUITEM "规整目录空格",                      IDM_SC_TRIM_CONTENTS
+            MENUITEM "排序目录*",                       IDM_SC_SORT_CONTENTS
+            MENUITEM "删除重复目录",                      IDM_SC_DEL_DUPLICATECONTENTS
+            MENUITEM "标记空目录",                       IDM_SC_MARK_EMPTYCONTENTS
         END
         MENUITEM SEPARATOR
-        MENUITEM "繁体转简体*",                  	IDM_BIG5_GBK
+        MENUITEM "繁体转简体*",                      IDM_BIG5_GBK
         MENUITEM SEPARATOR
         MENUITEM "合并段落",                        IDM_MERGE_PARAGRAPHS
         MENUITEM "规整段落",                        IDM_ALIGN_PARAGRAPHS
@@ -102,7 +102,7 @@ END
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS 0x40004L
+ FILEOS 0x4L
  FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
@@ -131,9 +131,7 @@ END
 // Bitmap
 //
 
-IDB_CONTENTSVIEWER      BITMAP                  "res\\ContentsViewer.bmp"
-
-IDB_TOOLBAR             BITMAP                  "res\\Toolbar.bmp"
+IDB_TOOLBAR      BITMAP                  "res\\Toolbar.bmp"
 
 
 #ifdef APSTUDIO_INVOKED
@@ -169,11 +167,7 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    IDD_ABOUTDLG, DIALOG
-    BEGIN
-    END
-
-    IDD_CVDLG, DIALOG
+    40000, DIALOG
     BEGIN
     END
 END
@@ -192,37 +186,37 @@ END
 
 STRINGTABLE
 BEGIN
-    IDB_NEXTPOS             "Navigate Forward"
+    IDB_NEXTPOS    			"Navigate Forward"
 END
 
 STRINGTABLE
 BEGIN
-    IDB_SCRIPT_MENU         "Script Menu"
+    IDB_SCRIPT_MENU   		"Script Menu"
 END
 
 STRINGTABLE
 BEGIN
-    IDB_PYSCRIPT_MENU       "PyScript Menu"
+    IDB_PYSCRIPT_MENU  		"PyScript Menu"
 END
 
 STRINGTABLE
 BEGIN
-    IDB_VIEWLIST            "View as List"
+    IDB_VIEWLIST 			"View as List"
 END
 
 STRINGTABLE
 BEGIN
-    IDB_VIEWTREE            "View as Tree"
+    IDB_VIEWTREE    		"View as Tree"
 END
 
 STRINGTABLE
 BEGIN
-    IDB_PARSE               "Parse"
+    IDB_PARSE       		"Parse"
 END
 
 STRINGTABLE
 BEGIN
-    IDB_EXTRA_MENU          "Extra Menu"
+    IDB_EXTRA_MENU   		"Extra Menu"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

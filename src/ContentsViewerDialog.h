@@ -6,8 +6,8 @@
 
 #include "help.h"
 #include "PluginInterface.h"
-#include "..\third-party\Win32xx_860\include\wxx_dialog.h"
-#include "..\third-party\Win32xx_860\include\wxx_toolbar.h"
+#include "Win32xx_860\include\wxx_dialog.h"
+#include "Win32xx_860\include\wxx_toolbar.h"
 #include "resource.h"
 #include "IniFile.h"
 #include <map>
@@ -60,31 +60,28 @@ protected:
 	void OnListViewItemClicked();
 	void OnListViewItemRClicked(NMHDR* lParam, LRESULT* pResult);
 	void OnTreeView(){};
-	void OnParse();
 	void OnExtraMenu();
-
-	void OnHeadIndexContents();
-
-	void OnExportContents();
-	void OnImportContents();
-
-	void OnNumberContents();
-	void OnAlignNumber(){};
-	void OnTrimContents();
-	void OnDelDuplicateContents();
-	void OnMarkEmptyContents();
-
-	void OnBig5ToGBK();
-	void OnMergeParagraphs();
-	void OnAlignParagraphs();
 
 	void ClearMapContent();
 
-	void UpdateContentListview();
-
 public:
 	size_t ParseCurFile();
-	size_t ReparseCurFile();
+	size_t ReParseCurFile();
+	void UpdateContentListview();
+
+	void HeadIndexContents();
+	void ExportContents();
+	void ImportContents();
+
+	void NumberContents();
+	void AlignNumber() {};
+	void TrimContents();
+	void DelDuplicateContents();
+	void MarkEmptyContents();
+
+	void Big5ToGBK();
+	void MergeParagraphs();
+	void AlignParagraphs();
 
 	int AddContent(int nItem, const TCHAR* tszContentName, int line, int level, const TCHAR* tszKeyword);
 	
@@ -101,8 +98,10 @@ private:
 
 	CToolBar mToolBar;
 
-	HMENU m_hScriptMenu;
-	HMENU m_hPyScriptMenu;
+	//HMENU m_hScriptMenu;
+	CMenu m_ScriptMenu;
+	//HMENU m_hPyScriptMenu;
+	CMenu m_PyScriptMenu;
 	CContentsListView* m_pContentsLV;
 	HMENU m_hContentContextMenu;
 	//CContentsTreeView mContentsTV;
@@ -129,7 +128,7 @@ private:
 	TCHAR m_tszKeyword[40];
 
 private:
-	void readCfg(const TCHAR* cfgFile);
+	void ReadCfg(const TCHAR* cfgFile);
 	//int FindAndReplace(const TCHAR* tszFind, const TCHAR* tszReplace);
 	void ListScripts();
 	//void ExecScript(size_t id);

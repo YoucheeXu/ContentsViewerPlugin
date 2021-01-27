@@ -59,7 +59,8 @@ public:
 	void CutLines(int lineStart, int lineEnd);
 	void PasteBeforeLine(int line);
 	void ReplaceLine(int line, const TCHAR* tszTxt);
-	void ReparseCurFile();
+	void ParseCurFile();
+	void ReParseCurFile();
 	int GetLine(int line, tString& tLine);
 	int GetLineCount();
 	int GetCurLineNo();
