@@ -1,24 +1,24 @@
+// Document.h
 #pragma once
 #ifndef _CDOCUMENT_H_
 #define _CDOCUMENT_H_
 
 #include "help.h"
-#include "PluginInterface.h"
-#include "resource.h"
-#include "IniFile.h"
+#include "..\third_party\Npp\PluginInterface.h"
 #include <map>
 #include <vector>
+#include "ContentsViewerMsgs.h"
 
 using namespace std;
 
-typedef struct _content
+typedef struct _ContentData
 {
-	tString tContent;
-	tString tKeyword;
+	wstring wContent;
+	wstring wKeyword;
 	int nLevel;
-} ContentData;
+} ContentData_t;
 
-typedef map<int, ContentData*> mapContent_t;
+typedef map<int, ContentData_t*> mapContent_t;
 
 class CDocument
 {
@@ -30,56 +30,61 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(CDocument);
 
 private:
-	size_t LineFromPos(size_t pos);
+	size_t LineNumFromPos(size_t pos);
+	size_t PosFromLineNum(size_t lineNum);
 
 public:
+
+	void SetParameters(const size_t ulineBetweenParagraphs, const wchar_t* wszNum, const size_t uCountX, const wchar_t* wszKeyword);
+	//void SetParameters(const size_t ulineBetweenParagraphs, const wchar_t wszNum[], const size_t uCountX, const wchar_t wszKeyword[]);
+
+	void FetchDocument();
+	void UpdateDocument();
+
 	void ClearmapContent();
 
-	size_t IndexContents(const TCHAR* tszText, const TCHAR* tszKeyword, int level);
+	size_t IndexContents(const wchar_t* wszText, const wchar_t* wszKeyword, int nLevel);
 
-	void DelLine(int line);
-	void CutLines(int lineStart, int lineEnd);
-	void PasteBeforeLine(int line);
-	void ReplaceLine(int line, const TCHAR* tszTxt);
-	size_t GetLine(int line, tString& tLine);
+	void DelLine(int nLineNum);
+	void CutLines(int nLineStart, int nLineEnd);
+	void PasteBeforeLine(int nLineNum);
+	void ReplaceLine(int nLineNum, const wchar_t* wszTxt);
+	size_t GetLine(int nLineNum, wstring& wLine);
 	size_t GetLineCount();
-	size_t GetCurLineNo();
 
-	void SetParameters(const size_t ulineBetweenParagraphs, const TCHAR* tszNum, const size_t uCountX, const TCHAR* tszKeyword);
-	//void SetParameters(const size_t ulineBetweenParagraphs, const TCHAR tszNum[], const size_t uCountX, const TCHAR tszKeyword[]);
-
-	void GetDocument(tString &tDoc){tDoc = m_tDoc;};
+	void GetDocument(wstring& wDoc){wDoc = m_wDoc;};
 	void MergeParagraphs();
 	void AlignParagraphs();
-	void ScriptReplace(const tString script);
-	void PyScriptReplace(const tString script);
+	void ScriptReplace(const wstring wScript);
 	void Big5ToGBK();
-	size_t ReplaceString(tString & tStr, const tString srcStr, const tString desSrc, bool bRegExp);
-	void SetDocument(const tString tDoc){m_tDoc = tDoc;};
+	// size_t ReplaceString(wstring & wStr, const wstring srcStr, const wstring desSrc, bool bRegExp);
+	void SetDocument(const wchar_t* wszDoc){m_wDoc = wszDoc;};
 
-	size_t Parse(bool bHeadIndexContent);
+	size_t Parse(stIndexType_t stIndexType, const wchar_t* wszIndex);
 	void TrimContents();
 	void NumberContents();
 	void DelDuplicateContents();
 	void MarkEmptyContents();
 	void UpdateContents();
-	void GetContent(mapContent_t& content){content = m_mapContent;};
 
-	int AddContent(int nItem, const TCHAR* tszContentName, int line, int level, const TCHAR* tszKeyword);
+	void GetContent(mapContent_t& content){content = m_mapContents;}
+	void SetContent(const mapContent_t content){m_mapContents = content;}
 
-	void ExportContents(const tString file);
-	void ImportContents(const tString file);
+	int AddContent(int nItem, const wchar_t* wszContentName, int nLine, int nLevel, const wchar_t* wszKeyword);
+
+	void ExportContents(const wstring wFile);
+	void ImportContents(const wstring wFile);
 
 private:
 	bool m_bDebug;
 
-	mapContent_t m_mapContent;
-	tString m_tDoc;
+	mapContent_t m_mapContents;
+	wstring m_wDoc;
 
 	size_t m_ulineBetweenParagraphs;
-	TCHAR m_tszNum[MAX_PATH];
+	wchar_t m_wszNum[MAX_PATH];
 	size_t m_uCountX;
-	TCHAR m_tszKeyword[40];
+	wchar_t m_wszKeyword[40];
 };
 
 #endif //_CDOCUMENT_H_

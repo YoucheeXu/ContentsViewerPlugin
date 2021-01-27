@@ -1,76 +1,69 @@
+// ContentsViewerDialog.h
 #pragma once
 #ifndef _CONTENTSVIEWERDIALOG_H_
 #define _CONTENTSVIEWERDIALOG_H_
 
-#pragma comment(lib,"comctl32.lib")
+#pragma comment(lib, "comctl32.lib")
 
 #include "help.h"
-#include "PluginInterface.h"
-#include "Win32xx_860\include\wxx_dialog.h"
-#include "Win32xx_860\include\wxx_toolbar.h"
+#include "..\third_party\Win32xx_860\include\wxx_dialog.h"
+#include "..\third_party\Win32xx_860\include\wxx_toolbar.h"
 #include "resource.h"
 #include "IniFile.h"
 #include <map>
 #include <vector>
 #include "Document.h"
+#include "ScriptPlugin.h"
 
 using namespace std;
 
 class CContentsListView;
 class CContentsTreeView;
 
-/*typedef struct _content
-{
-	tString tContent;
-	tString tKeyword;
-	int nLevel;
-} ContentData;*/
-
-class CContentsViewerDialog : public CDialog
+class CContentsViewerDialog: public CDialog
 {
 public :
 	CContentsViewerDialog();
 	virtual ~CContentsViewerDialog();
-	
+
 private:
 	DISALLOW_COPY_AND_ASSIGN(CContentsViewerDialog);
-	
+
 protected:
-	virtual INT_PTR DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
-	//virtual void EndDialog(INT_PTR nResult);
-	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	//virtual void OnCancel();
 	virtual BOOL OnInitDialog();
-	int CreateToolbar();
-	//virtual void OnOK();
+	BOOL CreateToolbar();
 
-	virtual LRESULT OnNotify(WPARAM wParam, LPARAM lParam);
-
+	virtual INT_PTR DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void OnSize(bool bInitial = false);
 
-	//void OnPrevPosClicked();
-	//void OnNextPosClicked();
-	//void OnUpdateBtnClicked();
-	void OnGotoPrevPos();
-	void OnGotoNextPos();
+	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void OnGotoPrevPos(){};
+	void OnGotoNextPos(){};
 	void OnScriptReplaceMenu();
 	void OnScriptReplace(size_t uMsg);
 	void OnPyScriptReplaceMenu();
 	void OnPyScriptReplace(size_t uMsg);
 	void OnListView(){};
-	void OnListViewItemClicked();
-	void OnListViewItemRClicked(NMHDR* lParam, LRESULT* pResult);
 	void OnTreeView(){};
 	void OnExtraMenu();
 
-	void ClearMapContent();
+	virtual LRESULT OnNotify(WPARAM wParam, LPARAM lParam);
+	void OnListViewItemClicked();
+	void OnListViewItemRClicked(NMHDR* lParam, LRESULT* pResult);
 
 public:
 	size_t ParseCurFile();
 	size_t ReParseCurFile();
-	void UpdateContentListview();
 
-	void HeadIndexContents();
+	int AddContent(int nItem, const wchar_t* wszContentName, int line, int nLevel, const wchar_t* wszKeyword);
+
+	void SavePos(int line){};
+
+	void UpdateContentListview();
+	void FocuseContentListviewItemByLine(int line);
+
+	void HeadIndex();
+	void SpecificIndex();
 	void ExportContents();
 	void ImportContents();
 
@@ -84,57 +77,77 @@ public:
 	void MergeParagraphs();
 	void AlignParagraphs();
 
-	int AddContent(int nItem, const TCHAR* tszContentName, int line, int level, const TCHAR* tszKeyword);
-	
-	void SavePos(int line);
-
-	void SetNPPWnd(HWND hNPPWnd) {m_hNPPWnd = hNPPWnd;}
-
-	void FocuseContentListviewItemByLine(int line);
-
 	void GetDocument(const CDocument* pDocument){pDocument = m_pDocument;};
-
 private:
 	bool m_bDebug;
 
-	CToolBar m_ToolBar;
 	CImageList m_ImageList;
-	//CToolTip m_ToolTip;
+	CToolBar m_ToolBar;
 
 	//HMENU m_hScriptMenu;
 	CMenu m_ScriptMenu;
 	//HMENU m_hPyScriptMenu;
 	CMenu m_PyScriptMenu;
-	CContentsListView* m_pContentsLV;
-	HMENU m_hContentContextMenu;
-	//CContentsTreeView mContentsTV;
 
 	HMENU m_hExtraMenu;
 
-	bool m_bHeadIndexContent;
-	
-	map<int, ContentData*> m_mapContent;
-	map<int, tString> m_mapScript;
+	CContentsListView* m_pContentsLV;
+	HMENU m_hContentContextMenu;
+
+	wchar_t m_wszScriptPath[MAX_PATH];
+
+	CIniFile* m_pIniFile;
+
+	int m_nMaxLevel;
+	stIndexType_t m_stIndexType;
+	wstring m_wIndex;
+
+	mapContent_t m_mapContent;
+	map<int, tString> m_mapScriptMenu;
+	// map<tString, tString> m_mapScriptExe;
+	// vector<tString> m_vecScriptExt;
+	CScriptPlugin* m_pScriptPlugin;
 
 	CDocument* m_pDocument;
-	int m_nMaxLevel;
-	//vector<int> m_vecLine;
-
-    HWND m_hNPPWnd;
-	// TCHAR m_tszAppPath[MAX_PATH];
-	TCHAR m_tszCfgPath[MAX_PATH];
-	TCHAR m_tszScriptPath[MAX_PATH];
 
 	size_t m_ulineBetweenParagraphs;
-	TCHAR m_tszNum[MAX_PATH];
+	wchar_t m_wszNum[MAX_PATH];
 	size_t m_uCountX;
-	TCHAR m_tszKeyword[40];
+	wchar_t m_wszKeyword[40];
 
 private:
-	void ReadCfg(const TCHAR* cfgFile);
-	//int FindAndReplace(const TCHAR* tszFind, const TCHAR* tszReplace);
-	void ListScripts();
+	//int FindAndReplace(const wchar_t* tszFind, const wchar_t* tszReplace);
+	void ListScripts(const wchar_t* scriptPath);
 	//void ExecScript(size_t id);
+	void ClearMapContent();
+
+protected:
+	// follow function copy from Editor.h of scintilla v4.23
+	// Coercion functions for transforming WndProc parameters into pointers
+	static void *PtrFromSPtr(sptr_t lParam) noexcept {
+		return reinterpret_cast<void *>(lParam);
+	}
+	static const char *ConstCharPtrFromSPtr(sptr_t lParam) noexcept {
+		return static_cast<const char *>(PtrFromSPtr(lParam));
+	}
+	static const unsigned char *ConstUCharPtrFromSPtr(sptr_t lParam) noexcept {
+		return static_cast<const unsigned char *>(PtrFromSPtr(lParam));
+	}
+	static char *CharPtrFromSPtr(sptr_t lParam) noexcept {
+		return static_cast<char *>(PtrFromSPtr(lParam));
+	}
+	static wchar_t *WCharPtrFromSPtr(sptr_t lParam) noexcept {
+		return static_cast<wchar_t *>(PtrFromSPtr(lParam));
+	}
+	static unsigned char *UCharPtrFromSPtr(sptr_t lParam) noexcept {
+		return static_cast<unsigned char *>(PtrFromSPtr(lParam));
+	}
+	static void *PtrFromUPtr(uptr_t wParam) noexcept {
+		return reinterpret_cast<void *>(wParam);
+	}
+	static const char *ConstCharPtrFromUPtr(uptr_t wParam) noexcept {
+		return static_cast<const char *>(PtrFromUPtr(wParam));
+	}
 };
 
 #endif //_CONTENTSVIEWERDIALOG_H_

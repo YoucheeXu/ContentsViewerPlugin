@@ -1,6 +1,6 @@
 #include "LogFile.h"
 #include "ContentsListView.h"
-#include "ContentsViewerPlugin.h"
+#include "ContentsViewer.h"
 
 //using namespace Win32xx;
 
@@ -11,8 +11,8 @@
 CContentsListView::CContentsListView()
 {
 	m_bDebug = false;
-	mSzDragItem = new TCHAR[MAX_PATH]; 
-	mIsDrag = false;
+	m_pszDragItem = new TCHAR[MAX_PATH]; 
+	m_bDrag = false;
 	//LVS_EX_FULLROWSELECT 表示选择整行
 	//TVN_BEGINDRAG
 	//LVS_SINGLESEL
@@ -20,7 +20,7 @@ CContentsListView::CContentsListView()
 
 CContentsListView::~CContentsListView()
 {
-	delete mSzDragItem;
+	delete m_pszDragItem;
 	//Destroy(); // to be sure GetHwnd() returns NULL
 }
 
@@ -64,12 +64,12 @@ LRESULT CContentsListView::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONUP:
 		//CPoint point;
-		//if(mIsDrag)
+		//if(m_bDrag)
 		//{
 		point.x = GET_X_LPARAM(lParam);
 		point.y = GET_Y_LPARAM(lParam);
 		OnLMouseUp(wParam, point);
-		//mIsDrag =false;
+		//m_bDrag =false;
 		//}
 		break;
 
@@ -112,24 +112,32 @@ void CContentsListView::OnLMouseDown(UINT nFlags, CPoint point)
 			lvi.mask = LVIF_TEXT | LVIF_PARAM;
 			lvi.iItem = iItem;
 			lvi.pszText = szItemText;
-			lvi.cchTextMax = sizeof(szItemText)/sizeof(szItemText[0]) - 1;
+			lvi.cchTextMax = sizeof(szItemText) / sizeof(szItemText[0]) - 1;
 
 			GetItem(lvi);
 
-			mMoveLineStart = (int) lvi.lParam;
+			m_nMoveLineStrt = (int)lvi.lParam;
 
-			//if (mMoveLineStart >= 0)
+			//if (m_nMoveLineStrt >= 0)
 			//{
-			//	thePlugin.GotoLine(mMoveLineStart + 15);
-			//	thePlugin.GotoLine(mMoveLineStart);
+			//	thePlugin.GotoLine(m_nMoveLineStrt + 15);
+			//	thePlugin.GotoLine(m_nMoveLineStrt);
 			//	//MessageBox(szItemText, _T("GotoLine"), MB_OK);
 			//}
 
 			//mLastItem = iItem;
 
-			_tcscpy(mSzDragItem, szItemText);
+			_tcscpy(m_pszDragItem, szItemText);
 
-			mMoveLineEnd = GetLineByItem(iItem + 1);;
+			int iNxtItem = iItem + 1;
+			if (iNxtItem == GetItemCount() - 1)
+			{
+				m_nMoveLineEnd = GetLineByItem(iNxtItem);
+			}
+			else
+			{
+				m_nMoveLineEnd = GetLineByItem(iNxtItem) - 1;
+			}
 		}
 	}
 }
@@ -141,20 +149,20 @@ void CContentsListView::OnMouseMove(UINT nFlags, CPoint point)
 
 		SetRedraw(FALSE);
 
-		//TextOut(hDC, point.x, point.y, mSzDragItem, _ARRAYSIZE(mSzDragItem));
-		//int iTextLen  = ::WideCharToMultiByte(CP_ACP, 0, mSzDragItem, -1, NULL, NULL, NULL, NULL);
-		int iTextLen = lstrlen(mSzDragItem);
-		RECT r =GetWindowRect();
-		TextOut(hDC, point.x+r.left+20, point.y+r.top-20, mSzDragItem, iTextLen/2-1);
+		//TextOut(hDC, point.x, point.y, m_pszDragItem, _ARRAYSIZE(m_pszDragItem));
+		//int iTextLen  = ::WideCharToMultiByte(CP_ACP, 0, m_pszDragItem, -1, NULL, NULL, NULL, NULL);
+		int iTextLen = lstrlen(m_pszDragItem);
+		RECT r = GetWindowRect();
+		TextOut(hDC, point.x + r.left + 20, point.y + r.top - 20, m_pszDragItem, iTextLen / 2 - 1);
 
 		SetRedraw(TRUE);
 
 		//::ReleaseDC(this->GetHwnd(), hDC);
 		::ReleaseDC(NULL, hDC);
-		mIsDrag =true;
+		m_bDrag = true;
 	}
 	else
-		mIsDrag =false;
+		m_bDrag = false;
 }
 
 void CContentsListView::OnLMouseUp(UINT nFlags, CPoint point)
@@ -162,26 +170,26 @@ void CContentsListView::OnLMouseUp(UINT nFlags, CPoint point)
 	UINT flag;
 	int nItem = HitTest(point, &flag);
 
-	int line = GetLineByItem(nItem);
+	int nLine = GetLineByItem(nItem);
 
-	if(mIsDrag)
+	if(m_bDrag)
 	{
-		tString msg = mSzDragItem;
+		tString msg = m_pszDragItem;
 		msg.append(_T(" will be pulled off before "));
 		msg = msg + GetItemText(nItem, 0).c_str();
 
 		if (MessageBox(msg.c_str(), _T("Drag Item"), MB_OKCANCEL) == IDOK)
 		{
-			thePlugin.CutLines(mMoveLineStart, mMoveLineEnd);
-			thePlugin.PasteBeforeLine(line);
+			thePlugin.CutLines(m_nMoveLineStrt, m_nMoveLineEnd);
+			thePlugin.PasteBeforeLine(nLine);
 			thePlugin.ReParseCurFile();
 		}
 		
 		//}
 		this->RedrawWindow();
-		mIsDrag = false;
+		m_bDrag = false;
 
-		//thePlugin.GotoLine(mMoveLineStart - mMoveLineEnd + line);
+		//thePlugin.GotoLine(m_nMoveLineStrt - m_nMoveLineEnd + nLine);
 	}
 
 	//mLastItem = nItem;
@@ -191,9 +199,9 @@ void CContentsListView::ChangeItem()
 {
 	LOGFUNBGN;
 	int nItem = GetSelectionMark();
-	int line = GetLineByItem(nItem);
-	LOGINFO(_T("Hot Item's line: %d\n"), line);
-	thePlugin.GotoLine(line);
+	int nLine = GetLineByItem(nItem);
+	LOGINFO(_T("Hot Item's line: %d\n"), nLine);
+	thePlugin.GotoLine(nLine);
 	LOGFUNEND;
 }
 
@@ -216,8 +224,8 @@ int CALLBACK CContentsListView::CompareFunc(LPARAM lParam1, LPARAM lParam2, LPAR
 	//int line1 = (int)(((LPLVITEM)lParam1)->lParam);
 	//int line2 = (int)(((LPLVITEM)lParam1)->lParam);
 
-	int line1 = (int)lParam1;
-	int line2 = (int)lParam2;
+	int nLine1 = (int)lParam1;
+	int nLine2 = (int)lParam2;
 
 	//CContentsListView* pCLV = (CContentsListView*)ptCLV;
 
@@ -227,9 +235,9 @@ int CALLBACK CContentsListView::CompareFunc(LPARAM lParam1, LPARAM lParam2, LPAR
 	//LOGINFO(_T("Line1 : %d\n"), line1);
 	//LOGINFO(_T("Line2 : %d\n"), line2);
 
-	if (line1 < line2)
+	if (nLine1 < nLine2)
 		return -1;
-	else if (line1 > line2)
+	else if (nLine1 > nLine2)
 		return 1;
 	else return 0;
 }
@@ -244,7 +252,7 @@ int CContentsListView::AddListViewItem(int nItem, const TCHAR* tszContentName, i
 
 	tString tContentName = tszContentName;
 
-	LVITEM lvi = { 0 };
+	LVITEM lvi = {0};
 
 	while (level > 1)
 	{
@@ -289,7 +297,7 @@ int CContentsListView::AddListViewItem(int nItem, const TCHAR* tszContentName, i
 
 void CContentsListView::FocusLastItem()
 {
-	int line = thePlugin.GetCurLineNo();
+	int line = thePlugin.GetCurLineNum();
 	int item = GetItemByLine(line);
 	FocusItem(item);
 }
@@ -348,6 +356,7 @@ void CContentsListView::SortItemsByLine()
 {
 	SortItems((PFNLVCOMPARE)CompareFunc, (DWORD)this);
 }
+
 //wait to test
 void CContentsListView::OnDelContents()
 {
@@ -390,26 +399,27 @@ void CContentsListView::OnDelContents()
 	//}
 
 	int nItem = GetSelectionMark();
-	int lineStart = GetLineByItem(nItem);
-	int lineEnd = 0;
+	int nLineStrt = GetLineByItem(nItem);
+	int nLineEnd = 0;
 	nItem = nItem + GetSelectedCount();
 
 	if (nItem != GetItemCount())
-		lineEnd = GetLineByItem(nItem);
+		nLineEnd = GetLineByItem(nItem);
 	else
-		lineEnd = thePlugin.GetLineCount();
+		nLineEnd = thePlugin.GetLineCount();
 	
-	LOGINFO(_T("Line %d to %d to be deleted！"), lineStart, lineEnd - 1);
-	thePlugin.CutLines(lineStart, lineEnd - 1);	
+	LOGINFO(_T("Line %d to %d to be deleted！"), nLineStrt, nLineEnd - 1);
+	thePlugin.CutLines(nLineStrt, nLineEnd - 1);	
 	LOGFUNEND;
 }
+
 //wait to test
 void CContentsListView::OnCutContents()
 {
 	LOGFUNBGN;
 	int iItem = GetSelectionMark();
 
-	int nLineStart = GetLineByItem(iItem);
+	int nLineStrt = GetLineByItem(iItem);
 	int nLineEnd = nLineStart;
 	if (iItem < GetItemCount())
 	{ 
@@ -422,9 +432,9 @@ void CContentsListView::OnCutContents()
 
 	LOGINFO(_T("Item to be cut: %d"), iItem + 1);
 	LOGINFO(_T("Count of Item: %d"), GetItemCount());
-	LOGINFO(_T("Lines to be cut from: %d to: %d"), nLineStart, nLineEnd - 1);
+	LOGINFO(_T("Lines to be cut from: %d to: %d"), nLineStrt, nLineEnd - 1);
 
-	thePlugin.CutLines(nLineStart, nLineEnd - 1);
+	thePlugin.CutLines(nLineStrt, nLineEnd - 1);
 
 	LOGFUNEND;
 }
@@ -434,12 +444,13 @@ void CContentsListView::OnInsetContentsBefore()
 	LOGFUNBGN;
 
 	int iItem = GetSelectionMark();
-	int line = GetLineByItem(iItem);
+	int nLine = GetLineByItem(iItem);
 
-	thePlugin.PasteBeforeLine(line);
+	thePlugin.PasteBeforeLine(nLine);
 	thePlugin.ReParseCurFile();
 	LOGFUNEND;
 }
+
 //wait to test
 void CContentsListView::OnSelectContents()
 {
@@ -447,8 +458,8 @@ void CContentsListView::OnSelectContents()
 	
 	int iItem = GetSelectionMark();
 
-	int nLineStart = GetLineByItem(iItem);
-	int nLineEnd = nLineStart;
+	int nLineStrt = GetLineByItem(iItem);
+	int nLineEnd = nLineStrt;
 	if (iItem < GetItemCount())
 	{ 
 		nLineEnd = GetLineByItem(iItem + 1);
@@ -458,21 +469,21 @@ void CContentsListView::OnSelectContents()
 		nLineEnd = thePlugin.GetLineCount();
 	}
 	
-	thePlugin.SelectLines(nLineStart, nLineEnd);
+	thePlugin.SelectLines(nLineStrt, nLineEnd);
 	
 	LOGFUNEND;
 }
 
-int CContentsListView::GetItemByLine(int line)
+int CContentsListView::GetItemByLine(int nLine)
 {
-	int line1, line2;
+	int nLine1, nLine2;
 	for(int iItem = 0; iItem<= GetItemCount()-1; iItem++)
 	{ 
-		line1 = GetLineByItem(iItem);
+		nLine1 = GetLineByItem(iItem);
 
-		line2 = GetLineByItem(iItem + 1);
+		nLine2 = GetLineByItem(iItem + 1);
 
-		if(line >= line1 && line < line2)
+		if(nLine >= nLine1 && nLine < nLine2)
 		{
 			return iItem;
 		}
@@ -484,5 +495,5 @@ void CContentsListView::FocusItem(int iItem)
 {
 	SetItemState(iItem, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 	SetSelectionMark(iItem);
-	EnsureVisible((iItem + 15)>GetItemCount() ? iItem : (iItem + 15), false);
+	EnsureVisible((iItem + 15) > GetItemCount() ? iItem : (iItem + 15), false);
 }

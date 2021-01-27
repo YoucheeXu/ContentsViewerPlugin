@@ -10,8 +10,19 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\PyScriptPluginSrc\emb.h" />
+    <ClInclude Include="..\PyScriptPluginSrc\PyScript.h" />
+    <ClInclude Include="..\PyScriptPluginSrc\PyScriptPlugin.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\PyScriptPluginSrc\emb.cpp" />
+    <ClCompile Include="..\PyScriptPluginSrc\PyScriptDllMain.cpp" />
+    <ClCompile Include="..\PyScriptPluginSrc\PyScript.cpp" />
+    <ClCompile Include="..\PyScriptPluginSrc\PyScriptPlugin.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{14B9D2E3-B213-4FD5-93C0-16F3CD4BED6B}</ProjectGuid>
+    <ProjectGuid>{92B5CD90-D903-46C3-B883-F2017B86B4B3}</ProjectGuid>
     <RootNamespace>ContentsViewerPlugin</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -41,12 +52,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ExtensionSDKDirectoryRoot)\Windows\Win32++\include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)\..\bin</OutDir>
+    <OutDir>$(SolutionDir)\..\bin\ContentsViewerPlugin</OutDir>
     <IntDir>$(SolutionDir)\..\trash</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(ExtensionSDKDirectoryRoot)\Windows\Win32++\include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)\..\bin</OutDir>
+    <OutDir>$(SolutionDir)\..\bin\ScriptPlugin</OutDir>
     <IntDir>$(SolutionDir)\..\trash</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -54,19 +65,18 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%USERPROFILE%\AppData\Local\Programs\Python\Python37-32\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%USERPROFILE%\AppData\Local\Programs\Python\Python37-32\libs</AdditionalLibraryDirectories>
+      <SubSystem>NotSet</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>"$(OutputPath)"\\update.bat</Command>
+      <Command>$(SolutionDir)\..\bin\update.bat</Command>
     </PostBuildEvent>
-    <BuildLog>
-      <Path>$(IntDir)\$(MSBuildProjectName).log</Path>
-    </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -76,54 +86,19 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>%USERPROFILE%\AppData\Local\Programs\Python\Python37-32\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%USERPROFILE%\AppData\Local\Programs\Python\Python37-32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>"$(OutputPath)"\\update.bat</Command>
+      <Command>$(SolutionDir)\..\bin\update.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\ContentsListView.cpp" />
-    <ClCompile Include="..\src\ContentsViewer.cpp" />
-    <ClCompile Include="..\src\ContentsViewerDialog.cpp" />
-    <ClCompile Include="..\src\DllMain.cpp" />
-    <ClCompile Include="..\src\Document.cpp" />
-    <ClCompile Include="..\src\help.cpp" />
-    <ClCompile Include="..\src\IniFile.cpp" />
-    <ClCompile Include="..\src\LogFile.cpp" />
-    <ClCompile Include="..\src\Plugin.cpp" />
-    <ClCompile Include="..\src\ScriptPlugin.cpp" />
-    <ClCompile Include="..\third_party\Win32InputBox.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\AboutBox.h" />
-    <ClInclude Include="..\src\ContentsListView.h" />
-    <ClInclude Include="..\src\ContentsViewer.h" />
-    <ClInclude Include="..\src\ContentsViewerDialog.h" />
-    <ClInclude Include="..\src\ContentsViewerMsgs.h" />
-    <ClInclude Include="..\src\Document.h" />
-    <ClInclude Include="..\src\help.h" />
-    <ClInclude Include="..\src\IniFile.h" />
-    <ClInclude Include="..\src\LogFile.h" />
-    <ClInclude Include="..\src\Plugin.h" />
-    <ClInclude Include="..\src\resource.h" />
-    <ClInclude Include="..\src\ScriptPlugin.h" />
-    <ClInclude Include="..\third_party\enum_array.h" />
-    <ClInclude Include="..\third_party\NPP\PluginInterface.h" />
-    <ClInclude Include="..\third_party\Win32InputBox.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\src\resource.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\src\res\ContentsViewer.bmp" />
-    <Image Include="..\src\res\Toolbar.bmp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

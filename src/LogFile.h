@@ -104,31 +104,31 @@ public:
 		LogOut(_T("OS time:\t%s\t%s\n\n"), datebuf, timebuf);
 	}
 
-	void LogOut(const wchar_t* wString, ...)
+	void LogOut(const wchar_t* wszString, ...)
 	{
 		// assert(m_pLog);
 
-		wchar_t wBuffer[4096];
+		wchar_t wszBuffer[4096];
 		va_list pArgList;
 
 		// The va_start macro (defined in STDARG.H) is usually equivalent to:
 		// pArgList = (char *) &szFormat + sizeof (szFormat) ;
 
-		va_start(pArgList, wString);
+		va_start(pArgList, wszString);
 
 		// The last argument to wvsprintf points to the arguments
 
-		// int n = sizeof(wBuffer) / sizeof(wchar_t);
+		// int n = sizeof(wszBuffer) / sizeof(wchar_t);
 
-		_vsnwprintf(wBuffer, sizeof(wBuffer) / sizeof(wchar_t),
-			wString, pArgList);
+		_vsnwprintf(wszBuffer, sizeof(wszBuffer) / sizeof(wchar_t),
+			wszString, pArgList);
 
 		// The va_end macro just zeros out pArgList for no good reason
 
 		va_end(pArgList);
 
 #ifdef _WIN32
-		OutputDebugStringW(wBuffer);
+		OutputDebugStringW(wszBuffer);
 		//OutputDebugStringW(_T("\n"));
 #else
 
@@ -138,7 +138,7 @@ public:
 #ifdef UNICODE
 		_wsetlocale(0, _T("chs")); //必须加上，否则fwprintf对中文不支持
 #endif
-		fwprintf(m_pLog, wBuffer);
+		fwprintf(m_pLog, wszBuffer);
 		//fwprintf(m_pLog, _T("\n"));
 
 		fflush(m_pLog);
@@ -232,6 +232,13 @@ extern CLogFile* g_pLogFile; //= &theLogFile;
 		LOGOUT("\n");		\
 	}
 
+#define LOGWARN(tErr, ...)\
+	if(g_bDebug && m_bDebug) {	\
+		LOGOUT("WARN:\t");	\
+		LOGOUT(tErr, ## __VA_ARGS__);	\
+		LOGOUT("\n");	\
+	}
+
 #define LOGERR(tErr, ...)\
 	if(g_bDebug && m_bDebug) {	\
 		LOGOUT("ERROR:\t");	\
@@ -262,5 +269,8 @@ extern CLogFile* g_pLogFile; //= &theLogFile;
 #define VLOG(b) 	\
 	if(!b) {LOGERR(#b); return false;}	\
 		else LOGOK(#b);
+
+void PrintDebugString(const char* szString, ...);
+void PrintDebugString(const wchar_t* wszString, ...);
 
 #endif//!__LOGFILE__H__

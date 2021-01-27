@@ -30,19 +30,19 @@
 #define PLUGININTERFACE_H
 
 #ifndef SCINTILLA_H
-#include "Npp\Scintilla.h"
+#include "Scintilla.h"
  #endif //SCINTILLA_H
 
 #ifndef NOTEPAD_PLUS_MSGS_H
-#include "Npp\Notepad_plus_msgs.h"
+#include "Notepad_plus_msgs.h"
 #endif //NOTEPAD_PLUS_MSGS_H
 
 // #include <windows.h>
 // #include <commctrl.h>
 #include "resource.h"
-#include "Npp\menuCmdID.h"
-#include "Npp\Docking.h"
-#include "Npp\dockingResource.h"
+#include "menuCmdID.h"
+#include "Docking.h"
+#include "dockingResource.h"
 
 const int nbChar = 64;
 

@@ -3,7 +3,7 @@
 #define CONTENTSLISTVIEW_H
 
 #include "help.h"
-#include "Win32xx_860\include\wxx_listview.h"
+#include "..\third_party\Win32xx_860\include\wxx_listview.h"
 //#include "win32++/include/frame.h"
 
 #include "resource.h"
@@ -54,10 +54,10 @@ public:
 	void FocusItem(int iItem);
 	
 private:
-	int mMoveLineStart;
-	int mMoveLineEnd;
-	TCHAR* mSzDragItem;
-	bool mIsDrag;
+	int m_nMoveLineStrt;
+	int m_nMoveLineEnd;
+	TCHAR* m_pszDragItem;
+	bool m_bDrag;
 	bool m_bDebug;
 	
 protected:

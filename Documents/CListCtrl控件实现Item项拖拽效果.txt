@@ -1,0 +1,97 @@
+MFC开发实用教程1:CListCtrl控件实现Item项拖拽效果
+原创独枕寒流 发布于2014-03-30 19:14:44 阅读数 4584  收藏
+展开
+CListCtrl控件拖拽Item项，闲话少说，先上效果图给大家看看
+
+
+
+看到效果图后，大家是不是觉得很赞，是不是很想知道，这样的效果是怎样实现的呢？ok
+
+直奔主题，下面我说说实现步骤
+
+一、添加一个CDragListCtrl类继承于CListCtrl类
+
+二、CDragListCtrl类中处理=LVN_BEGINDRAG，WM_MOUSEMOVE,WM_LBUTTONUP消息即可
+
+消息：=LVN_BEGINDRAG 对应的消息函数：OnLvnBegindrag(NMHDR *pNMHDR, LRESULT *pResult)
+
+消息：WM_MOUSEMOVE 对应的消息函数：OnMouseMove(UINT nFlags, CPoint point)
+
+消息：WM_LBUTTONUP 对应的消息函数：OnLButtonUp(UINT nFlags, CPoint point)
+
+void CDragListCtrl::OnLvnBegindrag(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+ 
+	int count = GetSelectedCount();
+	if (1 != count)
+		return;
+ 
+	POSITION pos = GetFirstSelectedItemPosition();
+	if (NULL == pos)
+		return;
+ 
+	m_nSelItem = GetNextSelectedItem(pos);
+ 
+	if (-1 == m_nSelItem)
+		return;
+ 
+	CPoint pt = pNMLV->ptAction;
+	m_pDragImageList = CreateDragImage(m_nSelItem, &pt);
+	if (NULL == m_pDragImageList)
+		return;
+ 
+	m_bDragging = TRUE;
+	m_pDragImageList->BeginDrag(0, CPoint(8, 8));
+	ClientToScreen(&pt);
+	CRect rt;
+	GetParent()->GetWindowRect(&rt);
+	pt.x -= rt.left;
+	pt.y -= rt.top;
+	m_pDragImageList->DragEnter(GetParent(), pt);
+	SetCapture();
+}
+
+void CDragListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	if (m_bDragging)
+	{
+		ReleaseCapture();
+		m_bDragging = FALSE;
+		//m_nSelItem = -1;
+		m_pDragImageList->DragLeave(GetParent());
+		m_pDragImageList->EndDrag();
+		m_pDragImageList->DeleteImageList();
+ 
+		delete m_pDragImageList;
+		m_pDragImageList = NULL;
+	}
+ 
+	CListCtrl::OnLButtonUp(nFlags, point);
+}
+
+void CDragListCtrl::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	if (m_bDragging)
+	{
+		CPoint pt = point;
+		ClientToScreen(&pt);
+ 
+		CRect rt;
+		GetParent()->GetWindowRect(&rt);
+		pt.x -= rt.left;
+		pt.y -= rt.top;
+		m_pDragImageList->DragMove(pt);
+	}
+ 
+	CListCtrl::OnMouseMove(nFlags, point);
+}
+
+源码下载链接：http://download.csdn.net/detail/d704791892/7121257
+————————————————
+版权声明：本文为CSDN博主「独枕寒流」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/d704791892/article/details/22600075

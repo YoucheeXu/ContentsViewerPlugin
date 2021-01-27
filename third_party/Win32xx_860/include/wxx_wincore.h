@@ -1393,7 +1393,7 @@ namespace Win32xx
     inline CWnd CWnd::GetDlgItem(int dlgItemID) const
     {
         assert(IsWindow());
-        return CWnd( ::GetDlgItem(*this, dlgItemID) );
+        return CWnd(::GetDlgItem(*this, dlgItemID));
     }
 
     // The GetDlgItemInt function translates the text of a specified control in a dialog box into an integer value.

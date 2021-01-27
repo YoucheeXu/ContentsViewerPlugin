@@ -18,10 +18,8 @@
 #include <cstdio>   // for FILE
 #include <cassert>
 #include <map>
-#include <cstring>
-#include <tchar.h>
 
-// typedef std::basic_string<TCHAR> tString;
+// typedef std::basic_string<wchar_t> wstring;
 
 //************************* **end of -- include ******************************
 
@@ -39,39 +37,39 @@ class CIniFile
 {
 public:
 	CIniFile();
-	CIniFile(const TCHAR* tszfile);
+	CIniFile(const wchar_t* wszfile);
 	~CIniFile();
 	
 private:
 	FILE* m_pFile;	//p_inifile
-	//typedef map<tString, tString> keymap;
-	map<tString, map<tString, tString>> m_mapData;
-	//map<std::basic_string<TCHAR>, map<std::basic_string<TCHAR>, std::basic_string<TCHAR>>> m_mapData;
-	//map<tString, tString>::iterator intertr;
+	//typedef map<wstring, wstring> keymap;
+	map<wstring, map<wstring, wstring>> m_mapData;
+	//map<std::basic_string<wchar_t>, map<std::basic_string<wchar_t>, std::basic_string<wchar_t>>> m_mapData;
+	//map<wstring, wstring>::iterator intertr;
 	bool m_pChanged;
-	TCHAR* m_tszfile;
+	wchar_t* m_wszfile;
 
 public:
-	int OpenFile(const TCHAR* psz_file);
+	int OpenFile(const wchar_t* wszFile);
 
-	bool GetString(const TCHAR* section, const TCHAR* key, TCHAR* value);
-	bool SetString(const TCHAR* section, const TCHAR* key, const TCHAR* value);
+	bool GetString(const wchar_t* wszSection, const wchar_t* wszKey, wchar_t* wszValue);
+	bool SetString(const wchar_t* wszSection, const wchar_t* wszKey, const wchar_t* wszValue);
 
-	int GetInteger(const TCHAR* section, const TCHAR* key, int default_value = 0);
-	bool SetInteger(const TCHAR* section, const TCHAR* key, const int value);
+	int GetInteger(const wchar_t* wszSection, const wchar_t* wszKey, int default_value = 0);
+	bool SetInteger(const wchar_t* wszSection, const wchar_t* wszKey, const int value);
 
-	long GetLong(const TCHAR* section, const TCHAR* key, long default_value = 0);
-	bool SetLong(const TCHAR* section, const TCHAR* key, const long value);
+	long GetLong(const wchar_t* wszSection, const wchar_t* wszKey, long default_value = 0);
+	bool SetLong(const wchar_t* wszSection, const wchar_t* wszKey, const long value);
 
-	double GetDouble(const TCHAR* section, const TCHAR* key, double default_value = 0);
-	bool SetDouble(const TCHAR* section, const TCHAR* key, const double value);
+	double GetDouble(const wchar_t* wszSection, const wchar_t* wszKey, double default_value = 0);
+	bool SetDouble(const wchar_t* wszSection, const wchar_t* wszKey, const double value);
 
-	bool GetBool(const TCHAR* section, const TCHAR* key, bool default_value = false);
-	bool SetBool(const TCHAR* section, const TCHAR* key, const bool default_value);
+	bool GetBool(const wchar_t* wszSection, const wchar_t* wszKey, bool default_value = false);
+	bool SetBool(const wchar_t* wszSection, const wchar_t* wszKey, const bool value);
 
 private:
 	// DISALLOW_COPY_AND_ASSIGN(CIniFile);
-	//bool Init(void);
+
 	int CloseFile(void);
 	bool m_bDebug;
 };

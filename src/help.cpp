@@ -1,31 +1,31 @@
 ﻿#include "help.h"
+#include <regex>
 
 bool g_bDebug;
 //CLogFile* g_pLogFile;
 using namespace std;
 
-TCHAR* _tcstrim(TCHAR* str)
+wchar_t* _wcstrim(wchar_t* wsz)
 {
-	//TCHAR* newstr;
-	TCHAR newstr[256];
-	int len = _tcslen(str);
-	if (len == 1) return str;
-	//newstr = new TCHAR[len];
+	wchar_t newWsz[256];
+	int len = wcslen(wsz);
+	if (len == 1) return wsz;
+
 	int j = 0;
-	for (int i = 0; str[i] != _T('\0'); i++)
+	for (int i = 0; wsz[i] != L'\0'; i++)
 	{
-		if (str[i] == _T(' ') || str[i] == _T('\n')) continue;
-		newstr[j] = str[i];
+		if (wsz[i] == L' ' || wsz[i] == L'\n') continue;
+		newWsz[j] = wsz[i];
 		j++;
 	}
-	newstr[j] = _T('\0');
-	_tcscpy(str, newstr);
-	//delete newstr;
-	return str;
+	newWsz[j] = L'\0';
+	wcscpy(wsz, newWsz);
+
+	return wsz;
 }
 
 // wait to test
-TCHAR* _tcstrimAll(TCHAR* str)
+wchar_t* _wcstrimAll(wchar_t* wsz)
 {
 	/*
 	//TCHAR* newstr;
@@ -48,7 +48,7 @@ TCHAR* _tcstrimAll(TCHAR* str)
 	// _tcscpy(str, newstr);
 	//delete newstr;
 	return newstr;*/
-	return _tcstrim(str);
+	return _wcstrim(wsz);
 }
 
 /* Error
@@ -113,56 +113,58 @@ TCHAR* _tcstrimRight(const TCHAR* str)
 #endif
 }*/
 
-void StringTrimLeft(tString& str)
+void StringTrimLeft(wstring& wStr)
 {
-	const tString drop = _T(" 　\r\n\t");
+	const wstring wDrop = L" 　\r\n\t";
 
-	size_t pos = str.find_first_not_of(drop);
-	if (pos != tString::npos)
+	size_t pos = wStr.find_first_not_of(wDrop);
+	if (pos != wstring::npos)
 	{
-		str.erase(0, pos);
+		wStr.erase(0, pos);
 	}
 }
 
-void StringTrimRight(tString& str)
+void StringTrimRight(wstring& wStr)
 {
 	//const tString drop = _T(" 　\r\n\t");
-	const tString drop = _T(" 　\t");
+	const wstring wDrop = L" 　\t";
 
-	size_t pos = str.find_last_not_of(drop);
+	size_t pos = wStr.find_last_not_of(wDrop);
 
-	if (pos != tString::npos)
+	if (pos != wstring::npos)
 	{
-		str.erase(pos+1);
+		wStr.erase(pos+1);
 	}
 }
 
-void StringReplace(tString& tOrg, const TCHAR* tszFrom, const TCHAR* tszTo)
+void StringReplace(wstring& wOrg, const wchar_t* wszFrom, const wchar_t* wszTo)
 {
-	size_t pos = tOrg.find(tszFrom);
-	int len = _tcslen(tszFrom);
-	if (tString::npos != pos)
+	size_t pos = wOrg.find(wszFrom);
+	int len = wcslen(wszFrom);
+	if (wstring::npos != pos)
 	{
-		tOrg.replace(pos, len, tszTo);
+		wOrg.replace(pos, len, wszTo);
 		//pos = tOrg.find(tszFrom);
 	}
 }
 
-int StringReplaceAll(tString& tOrg, const TCHAR* tszFrom, const TCHAR* tszTo, bool bRegrex)
+int StringReplaceAll(wstring& wOrg, const wchar_t* wszFrom, const wchar_t* wszTo, bool bRegrex)
 {
 	int count = 0;
-	if(false == bRegrex) {
-		tString::size_type pos = tOrg.find(tszFrom);
-		int len = _tcslen(tszFrom);
+	if(false == bRegrex)
+	{
+		wstring::size_type pos = wOrg.find(wszFrom);
+		int len = wcslen(wszFrom);
 
-		while(tString::npos != pos)
+		while(wstring::npos != pos)
 		{
 			count++;
-			tOrg.replace(pos, len, tszTo);
-			pos = tOrg.find(tszFrom);
+			wOrg.replace(pos, len, wszTo);
+			pos = wOrg.find(wszFrom);
 		}
 	}
-	else {		//wait to test
+	else
+	{		//wait to test
 		/*template <class traits, class charT>
 			basic_string<charT> regex_replace(
 			const basic_string<charT>& s,
@@ -171,35 +173,36 @@ int StringReplaceAll(tString& tOrg, const TCHAR* tszFrom, const TCHAR* tszTo, bo
 			match_flag_type flags = match_default);*/
 			
 		// regular expression
-		const std::wregex pattern(tszFrom);
+		const std::wregex wPattern(wszFrom);
 
 		// transformation pattern, reverses the position of all capture groups
-		tString replacer = tszTo;
+		wstring wReplacer = wszTo;
 
 		// apply the tranformation
-		tOrg = std::regex_replace(tOrg, pattern, replacer);
+		wOrg = std::regex_replace(wOrg, wPattern, wReplacer);
 	}
 	return count;
 }
 
 //wait to test
-size_t StringReplaceAll(tString & tStr, const tString srcStr, const tString desStr, bool bRegExp)
+size_t StringReplaceAll(wstring& wStr, const wstring wSrcStr, const wstring wDesStr, bool bRegExp)
 {
 	size_t count = 0;
-	if(false == bRegExp) {
+	if(false == bRegExp)
+	{
 		//tString::size_type pos = tStr.find(finder.c_str();
-		tString::size_type pos = 0;
+		wstring::size_type pos = 0;
 		// tString::size_type srclen = _tcslen(finder.c_str());
-		tString::size_type srcLen = srcStr.size();
-		tString::size_type dstLen = desStr.size();
+		wstring::size_type srcLen = wSrcStr.size();
+		wstring::size_type dstLen = wDesStr.size();
 
-		while((pos = tStr.find(srcStr, pos)) != std::string::npos)
+		while((pos = wStr.find(wSrcStr, pos)) != std::string::npos)
 		// while(tString::npos != pos)
 		{
 			count++;
 			// tStr.replace(pos, srcLen, desStr.c_str());
-			tStr.replace(pos, srcLen, desStr);
-			// pos = tStr.find(srcStr.c_str());
+			wStr.replace(pos, srcLen, wDesStr);
+			// pos = tStr.find(wSrcStr.c_str());
 			pos += dstLen;
 		}
 	}
@@ -217,41 +220,41 @@ size_t StringReplaceAll(tString & tStr, const tString srcStr, const tString desS
 			// regular expression
 			//syntax_option_type flags = ECMAScript | icase;
 			//const std::wregex wregex(srcStr.c_str(), flags);
-			const std::wregex pattern(srcStr.c_str());
+			const std::wregex wPattern(wSrcStr.c_str());
 
 			// transformation pattern, reverses the position of all capture groups
 			//tString desStr = tszTo;
 
 			// apply the tranformation
 			//tStr = regex_replace(tStr, wregex(find.c_str(), flags), rep.c_str());
-			tStr = std::regex_replace(tStr, pattern, desStr.c_str());
+			wStr = std::regex_replace(wStr, wPattern, wDesStr.c_str());
 		}
 		catch (regex_error& e)
 		{
-			LOGFUNMSG(_T("%s: %d."), e.what(), e.code());
+			//LOGFUNMSG(_T("%s: %d."), e.what(), e.code());
 		}
 	}
 	return count;
 }
 
-void StringErase(tString& tOrg, const TCHAR* tszDrop)
+void StringErase(wstring& wOrg, const wchar_t* wszDrop)
 {
-	size_t pos = tOrg.find(tszDrop);
-	int len = _tcslen(tszDrop);
-	if (pos != tString::npos) tOrg.erase(pos, len);
+	size_t pos = wOrg.find(wszDrop);
+	int len = wcslen(wszDrop);
+	if (pos != wstring::npos) wOrg.erase(pos, len);
 }
 
-int StringEraseAll(tString& tOrg, const TCHAR* tszDrop)
+int StringEraseAll(wstring& wOrg, const wchar_t* wszDrop)
 {
-	size_t pos = tOrg.find(tszDrop);
-	int len = _tcslen(tszDrop);
+	size_t pos = wOrg.find(wszDrop);
+	int len = wcslen(wszDrop);
 	
 	int count = 0;
-	while(pos != tString::npos)
+	while(pos != wstring::npos)
 	{
 		count++;
-		tOrg.erase(pos, len);
-		pos = tOrg.find(tszDrop);
+		wOrg.erase(pos, len);
+		pos = wOrg.find(wszDrop);
 	}
 	return count;
 }

@@ -2,30 +2,31 @@
 #include <cstdlib>
 #include <iostream>
 #include "IniFile.h"
-//#include "LogFile.h"
 //************************* **end of -- include ******************************
 
 using namespace std;
 
 CIniFile::CIniFile() {
-	m_pFile = NULL;
+	m_pFile = nullptr;
 	m_pChanged = false;
 	m_bDebug = false;
 }
 
-CIniFile::CIniFile(const TCHAR* tszfile) {
-	m_pFile = NULL;
+CIniFile::CIniFile(const wchar_t* wszFile)
+{
+	m_pFile = nullptr;
 	m_pChanged = false;
 
-	m_tszfile = const_cast<TCHAR*>(tszfile);
-	switch(OpenFile(tszfile)) {
+	m_wszfile = const_cast<wchar_t*>(wszFile);
+	switch(OpenFile(m_wszfile))
+	{
 		case 0:
 			break;
 		case 1:
-			//LOGINFO(_T("fail to open %s file"), tszfile);
+			//LOGINFO(L"fail to open %s file"), tszfile);
 			break;
 		case 2:
-			//LOGINFO(_T("fail to read %s file to buffer"), tszfile);
+			//LOGINFO(L"fail to read %s file to buffer"), tszfile);
 			break;
 	}
 }
@@ -44,71 +45,67 @@ CIniFile::~CIniFile() {
  *	-2  -- fail to read file to buffer
  *	-3	-- fail to close last file
 *******************************************************************************/
-int CIniFile::OpenFile(const TCHAR* tszfile)
+int CIniFile::OpenFile(const wchar_t* m_wszfile)
 {
-	// LOGFUNBGN;
-	
 	int ret = 0;
 	
-	if(m_pFile != NULL) {
+	if(m_pFile != nullptr) {
 		
 		ret = CloseFile();
 		
 		if(ret != 0) return -3;
 	}
 
-	//LOGINFO(_T("ready to Open ini File: %s\n"), tszfile);
-
 	// open file
-	//m_pFile = _tfopen(tszfile, _T("r+"));
-	// _tfopen_s(&m_pFile, tszfile, _T("a+"));
-	// _tfopen_s(&m_pFile, tszfile, _T("r"));
-	m_pFile = _tfopen(tszfile, _T("a+,ccs=UNICODE"));
+	//m_pFile = _tfopen(tszfile, L"r+"));
+	// _tfopen_s(&m_pFile, tszfile, L"a+"));
+	// _tfopen_s(&m_pFile, tszfile, L"r"));
+	m_pFile = _wfopen(m_wszfile, L"a+, ccs=UNICODE");
 	assert(m_pFile);
 
-	TCHAR tszLine[256];
+	wchar_t wszLine[256];
 
-	TCHAR *tszKey, *tszValue;
+	wchar_t *wszKey, *wszValue;
 	
-	tString tSection;
-	//std::basic_string<TCHAR> tSection;
+	wstring wSection;
+	//std::basic_string<wchar_t> tSection;
 
 	//while(!fin.eof())
-	while(_fgetts(tszLine, 256, m_pFile))
+	while(fgetws(wszLine, 256, m_pFile))
 	{
-		//LOGINFO(_T("Line£º%s"), tszLine);
+		//LOGINFO(L"Line£º%s"), tszLine);
 
 		// _tcscpy(tszLine, _tcstrim(tszLine));	//trim bank in head and tail
-		_tcscpy(tszLine, _tcstrimAll(tszLine));	//trim bank in head and tail, middle
-		//if(_tcscmp(tszLine[0], _T('[')) == 0)
-		OutputDebugString(tszLine);
-		if(tszLine[0] == _T('['))
+		wcscpy(wszLine, _wcstrimAll(wszLine));	//trim bank in head and tail, middle
+		//if(_tcscmp(tszLine[0], L'[')) == 0)
+		//PrintDebugString(L"Line = %s\n", wszLine);
+
+		if(wszLine[0] == L'[')
 		{
 			//tszLine = Mid(tszLine, 1, _tcslen(tszLine)-2);
-			tSection = tszLine;
+			wSection = wszLine;
 			//tSection = tSection.substr(1, _tcslen(tszLine) - 3);
-			tSection = tSection.substr(1, _tcslen(tszLine) - 2);
-			//map<tString, tString> mapSection;
+			wSection = wSection.substr(1, wcslen(wszLine) - 2);
+			//map<wstring, wstring> mapSection;
 			//m_mapData[tSection] = mapSection;
-			//LOGINFO(_T("Section: %s"), tSection.c_str());
+			//LOGINFO(L"wszSection: %s"), tSection.c_str());
 		}
-		//else if((_tcscmp(tszLine[0], _T('#')) != 0) || (_tcscmp(tszLine[0], _T(';')) != 0))
-		else if (tszLine[0] != _T('#') && tszLine[0] != _T(';') && tszLine[0] != _T('\n'))
+		//else if((_tcscmp(tszLine[0], L'#')) != 0) || (_tcscmp(tszLine[0], L';')) != 0))
+		else if (wszLine[0] != L'#' && wszLine[0] != L';' && wszLine[0] != L'\n')
 		{
-			tszKey = _tcstok(tszLine, _T("="));
-			tszValue = _tcstok(NULL, _T("="));
+			wszKey = _wcstok(wszLine, L"=");
+			wszValue = _wcstok(NULL, L"=");
 
-			if (NULL == tszValue)	tszValue = _T("");
-			if (NULL == tszKey) continue;
+			if (NULL == wszValue) wszValue = L"";
+			if (NULL == wszKey) continue;
 			// _tcscpy(tszKey, _tcstrim(tszKey));
-			_tcscpy(tszKey, _tcstrimAll(tszKey));
+			wcscpy(wszKey, _wcstrimAll(wszKey));
 			// _tcscpy(tszValue, _tcstrim(tszValue));
-			_tcscpy(tszValue, _tcstrimAll(tszValue));
-			m_mapData[tSection][tszKey] = tszValue;
-			OutputDebugString(_T("tszKey: %s,\t tszValue: %s, tszKey, tszValue"));
+			wcscpy(wszValue, _wcstrimAll(wszValue));
+			m_mapData[wSection][wszKey] = wszValue;
+			PrintDebugString(L"wszKey: %s,\t wszValue: %s\n", wszKey, wszValue);
 		}
 	}
-	// LOGFUNEND;
 	return ret;
 }
 
@@ -124,49 +121,50 @@ int CIniFile::CloseFile(void)
 {
 	// LOGFUNBGN;
 	// file not opened
-	if(m_pFile != NULL) {
+	if(m_pFile != nullptr) {
 
 		// save file if buffer changed
 		if (m_pChanged) {
 			// close file
 			fclose(m_pFile);
-			m_pFile = NULL;
-			m_pFile = _tfopen(m_tszfile, _T("w+"));
+			m_pFile = nullptr;
+			m_pFile = _wfopen(m_wszfile, L"w+");
 
-			//LOGINFO(_T("\nCloseFile -- wrtie file"));
+			//LOGINFO(L"\nCloseFile -- wrtie file"));
 			//_tfwrite(m_tszFilebuffer, m_lFilesize, 1, m_pFile);
-			map<tString, map<tString, tString>>::iterator multitr;
-			map<tString, tString>::iterator intertr;
-			for (multitr = m_mapData.begin(); multitr != m_mapData.end(); multitr++)
+			// map<wstring, map<wstring, wstring>>::iterator multitr;
+			// map<wstring, wstring>::iterator intertr;
+			for (auto multitr = m_mapData.begin(); multitr != m_mapData.end(); multitr++)
 			{
-				//std::wcout << _T("[") << multitr->first << _T("]") <<endl;
-				_fputts(_T("["), m_pFile);
-				_fputts(multitr->first.c_str(), m_pFile);
-				_fputts(_T("]\n"), m_pFile);
-				for (intertr = multitr->second.begin(); intertr != multitr->second.end(); intertr++)
+				//std::wcout << L"[") << multitr->first << L"]") <<endl;
+				fputws(L"[", m_pFile);
+				fputws(multitr->first.c_str(), m_pFile);
+				fputws(L"]\n", m_pFile);
+				for (auto intertr = multitr->second.begin(); intertr != multitr->second.end(); intertr++)
 				{
 					//std::wcout << intertr->first << " = " << intertr->second << endl;
-					_fputts(intertr->first.c_str(), m_pFile);
-					_fputts(_T(" = "), m_pFile);
-					_fputts(intertr->second.c_str(), m_pFile);
-					_fputts(_T("\n"), m_pFile);
+					fputws(intertr->first.c_str(), m_pFile);
+					fputws(L" = ", m_pFile);
+					fputws(intertr->second.c_str(), m_pFile);
+					fputws(L"\n", m_pFile);
 				}
 					
 			}
 		}
 		
 		// close file
-		if(fclose(m_pFile) != -1) {
-			m_pFile = NULL;
+		if(fclose(m_pFile) != -1)
+		{
+			m_pFile = nullptr;
 		}
 		else {
 			return -1;
 		}
 		
 		//clear map
-		map<tString, map<tString, tString>>::iterator multitr;
-		//map<tString, tString>::iterator intertr;
-		for (multitr = m_mapData.begin(); multitr != m_mapData.end(); multitr++) {
+		// map<wstring, map<wstring, wstring>>::iterator multitr;
+		//map<wstring, wstring>::iterator intertr;
+		for (auto multitr = m_mapData.begin(); multitr != m_mapData.end(); multitr++) {
 			multitr->second.clear();
 		}
 		
@@ -177,90 +175,87 @@ int CIniFile::CloseFile(void)
 }
 
 /*******************************************************************************
- *  desc: get a string value by key
+ *  desc: get a string value by  key and section
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   char *  value  -- key value
  *------------------------------------------------------------------------------
  * return: true  -- key value found
  *   false -- key value not found
 *******************************************************************************/
-bool CIniFile::GetString(const TCHAR* section, const TCHAR* key, TCHAR* value)
+bool CIniFile::GetString(const wchar_t* wszSection, const wchar_t* wszKey, wchar_t* wszValue)
 {
 	// LOGFUNBGN;
-	//keymap map = m_mapData[section];
-	//_tcscpy(value, map[key].c_str());
-	//m_mapData[section].find(key)->second
-	//_tcscpy(value, map->find(key)->second.c_str());
-	//tString* v = &m_mapData[section][key];
+	//keymap map = m_mapData[wszSection];
+	//_tcscpy(value, map[wszKey].c_str());
+	//m_mapData[wszSection].find(wszKey)->second
+	//_tcscpy(value, map->find(wszKey)->second.c_str());
+	//wstring* v = &m_mapData[wszSection][wszKey];
 	;
-	//tString v = static_cast<keymap>(m_mapData[section])[key];
-	/*map<tString, tString> * keymap = &m_mapData[section];
-	intertr = m_mapData[section].find(key);
-	tString v;
-	//v = m_mapData[section].at(key);
-	v = keymap->at(key);
-	//_tcscpy(value, m_mapData[section][key].c_str());*/
-	//map<tString, map<tString, tString>>::iterator multitr;
+	//wstring v = static_cast<keymap>(m_mapData[wszSection])[wszKey];
+	/*map<wstring, wstring> * keymap = &m_mapData[wszSection];
+	intertr = m_mapData[wszSection].find(wszKey);
+	wstring v;
+	//v = m_mapData[wszSection].at(wszKey);
+	v = keymap->at(wszKey);
+	//_tcscpy(value, m_mapData[wszSection][wszKey].c_str());*/
+	//map<wstring, map<wstring, wstring>>::iterator multitr;
 
-	map<tString, tString>::iterator intertr;
+	// map<wstring, wstring>::iterator intertr;
 	/*for (multitr = m_mapData.begin(); multitr != m_mapData.end(); multitr++)
 	{
 	std::wcout << "[" << multitr->first << "]" <<endl;
 	for (intertr = multitr->second.begin(); intertr != multitr->second.end(); intertr++)
 	std::wcout << intertr->first << " = " << intertr->second << endl;
 	}*/
-	intertr = m_mapData[section].find(key);
-	//std::wcout << _T("start to Get section: ") << (*intertr).first << " = " << (*intertr).second << endl;
-	if (intertr != m_mapData[section].end())
+	auto intertr = m_mapData[wszSection].find(wszKey);
+	//std::wcout << L"start to Get wszSection: ") << (*intertr).first << " = " << (*intertr).second << endl;
+	if (intertr != m_mapData[wszSection].end())
 	{
-		_tcscpy(value, (*intertr).second.c_str());
-		//LOGINFO(_T("Get section: %s, key: %s, value: %s\n"), section, key, value);
+		wcscpy(wszValue, (*intertr).second.c_str());
 
 		return true;
 	}
 	else
 	{
-		//LOGINFO(_T("Can't find: section: %s, key: %s"), section, key);
 		return false;
 	}
-	//LOGFUNEND;
 }
 
 /*******************************************************************************
- *  desc: set a string value by key
+ *  desc: set a string value by key and section
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
- *   const TCHAR* value  -- key value
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
+ *   const wchar_t* value  -- key value
  *------------------------------------------------------------------------------
- * return: true  -- key value success to write in buffer
+ * return: true  -- wszKey value success to write in buffer
 *******************************************************************************/
-bool CIniFile::SetString(const TCHAR* section, const TCHAR* key, const TCHAR* value)
+bool CIniFile::SetString(const wchar_t* wszSection, const wchar_t* wszKey, const wchar_t* wszValue)
 {
-	//LOGINFO(_T("Set section: %s, key: %s, value: %s\n"), section, key, value);
-	m_mapData[section][key] = value;
+	//LOGINFO(L"Set wszSection: %s, wszKey: %s, value: %s\n"), wszSection, wszKey, value);
+	m_mapData[wszSection][wszKey] = wszValue;
 	m_pChanged = true;
 	return true;
 }
 
 /*******************************************************************************
- *  desc: get a integer value by key
+ *  desc: get a integer value by  key and section
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   int default_value  -- default value
  *------------------------------------------------------------------------------
- * return: key value or default value
+ * return: wszKey value or default value
 *******************************************************************************/
-int CIniFile::GetInteger(const TCHAR* section, const TCHAR* key, int default_value)
+int CIniFile::GetInteger(const wchar_t* wszSection, const wchar_t* wszKey, int default_value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	if(GetString(section, key, tszBuffer))
+	if(GetString(wszSection, wszKey, wszBuffer))
 	{
-		return (int)(_ttoi(tszBuffer));
+		return (int)(_wtoi(wszBuffer));
 	}
 	return default_value;
 }
@@ -268,37 +263,37 @@ int CIniFile::GetInteger(const TCHAR* section, const TCHAR* key, int default_val
 /*******************************************************************************
  *  desc: set a integer value
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   const int  value   -- key value
  *------------------------------------------------------------------------------
  * return: true
 *******************************************************************************/
-bool CIniFile::SetInteger(const TCHAR* section, const TCHAR* key, const int value)
+bool CIniFile::SetInteger(const wchar_t* wszSection, const wchar_t* wszKey, const int value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	memset(tszBuffer, 0, sizeof(tszBuffer));
-	_stprintf(tszBuffer, _T("%d"), value);
-	return SetString(section, key, tszBuffer);
+	memset(wszBuffer, 0, sizeof(wszBuffer));
+	_stprintf(wszBuffer, L"%d", value);
+	return SetString(wszSection, wszKey, wszBuffer);
 }
 
 /*******************************************************************************
- *  desc: get a long value by key
+ *  desc: get a long value by key and section
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   long   default_value  -- default value
  *------------------------------------------------------------------------------
- * return: key value or default value
+ * return: wszKey value or default value
 *******************************************************************************/
-long CIniFile::GetLong(const TCHAR* section, const TCHAR* key, long default_value)
+long CIniFile::GetLong(const wchar_t* wszSection, const wchar_t* wszKey, long default_value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	if(GetString(section, key, tszBuffer))
+	if(GetString(wszSection, wszKey, wszBuffer))
 	{
-		return (int)(_ttol(tszBuffer));
+		return (int)(_wtol(wszBuffer));
 	}
 	return default_value;
 }
@@ -306,37 +301,37 @@ long CIniFile::GetLong(const TCHAR* section, const TCHAR* key, long default_valu
 /*******************************************************************************
  *  desc: set a long value
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   const long  value   -- key value
  *------------------------------------------------------------------------------
  * return: true
 *******************************************************************************/
-bool CIniFile::SetLong(const TCHAR* section, const TCHAR* key, const long value)
+bool CIniFile::SetLong(const wchar_t* wszSection, const wchar_t* wszKey, const long value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	memset(tszBuffer, 0, sizeof(tszBuffer));
-	_stprintf(tszBuffer, _T("%d"), value);
-	return SetString(section, key, tszBuffer);
+	memset(wszBuffer, 0, sizeof(wszBuffer));
+	_swprintf(wszBuffer, L"%d", value);
+	return SetString(wszSection, wszKey, wszBuffer);
 }
 
 /*******************************************************************************
- *  desc: get a double value by key
+ *  desc: get a double value by key and section
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   double  default_value  -- default value
  *------------------------------------------------------------------------------
- * return: key value or default value
+ * return: wszKey value or default value
 *******************************************************************************/
-double CIniFile::GetDouble(const TCHAR* section, const TCHAR* key, double default_value)
+double CIniFile::GetDouble(const wchar_t* wszSection, const wchar_t* wszKey, double default_value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	if(GetString(section, key, tszBuffer))
+	if(GetString(wszSection, wszKey, wszBuffer))
 	{
-		return (int)(_ttof(tszBuffer));
+		return (int)(_wtof(wszBuffer));
 	}
 	return default_value;
 }
@@ -344,43 +339,43 @@ double CIniFile::GetDouble(const TCHAR* section, const TCHAR* key, double defaul
 /*******************************************************************************
  *  desc: set a double value
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
- *   const double value   -- key value
+ * param: const wchar_t* wszSection -- wszSection name
+ *   const wchar_t* wszKey   -- wszKey name
+ *   const double value   -- wszKey value
  *------------------------------------------------------------------------------
  * return: true
 *******************************************************************************/
-bool CIniFile::SetDouble(const TCHAR* section, const TCHAR* key, const double value)
+bool CIniFile::SetDouble(const wchar_t* wszSection, const wchar_t* wszKey, const double value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	memset(tszBuffer, 0, sizeof(tszBuffer));
-	_stprintf(tszBuffer, _T("%g"), value);
-	return SetString(section, key, tszBuffer);
+	memset(wszBuffer, 0, sizeof(wszBuffer));
+	_swprintf(wszBuffer, L"%g", value);
+	return SetString(wszSection, wszKey, wszBuffer);
 }
 
 /*******************************************************************************
- *  desc: get a boolean value by key
+ *  desc: get a boolean value by key and section
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   bool   b_default  -- default value
  *------------------------------------------------------------------------------
  * return: key value or default value
 *******************************************************************************/
-bool CIniFile::GetBool(const TCHAR* section, const TCHAR* key, bool default_value)
+bool CIniFile::GetBool(const wchar_t* wszSection, const wchar_t* wszKey, bool default_value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	if(GetString(section, key, tszBuffer))
+	if(GetString(wszSection, wszKey, wszBuffer))
 	{
-		if(_tcscmp(tszBuffer, _T("y")) == 0 ||		
-			_tcscmp(tszBuffer, _T("yes")) == 0 ||
-			_tcscmp(tszBuffer, _T("true")) == 0 )
+		if(wcscmp(wszBuffer, L"y") == 0 ||
+			wcscmp(wszBuffer, L"yes") == 0 ||
+			wcscmp(wszBuffer, L"true") == 0 )
 			return true;
-		if(_tcscmp(tszBuffer, _T("n")) == 0 ||
-			_tcscmp(tszBuffer, _T("no")) == 0  ||
-			_tcscmp(tszBuffer, _T("false")) == 0 )
+		if(wcscmp(wszBuffer, L"n") == 0 ||
+			wcscmp(wszBuffer, L"no") == 0  ||
+			wcscmp(wszBuffer, L"false") == 0 )
 			return false;
 	}
 	return default_value;
@@ -389,20 +384,20 @@ bool CIniFile::GetBool(const TCHAR* section, const TCHAR* key, bool default_valu
 /*******************************************************************************
  *  desc: set a boolean value
  *------------------------------------------------------------------------------
- * param: const TCHAR* section -- section name
- *   const TCHAR* key   -- key name
+ * param: const wchar_t* wszSection -- section name
+ *   const wchar_t* wszKey   -- key name
  *   const bool value   -- key value
  *------------------------------------------------------------------------------
  * return: true
 *******************************************************************************/
-bool CIniFile::SetBool(const TCHAR* section, const TCHAR* key, const bool value)
+bool CIniFile::SetBool(const wchar_t* wszSection, const wchar_t* wszKey, const bool value)
 {
-	TCHAR tszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
+	wchar_t wszBuffer[M_MAX_INTVAL_BUFFER_SIZE];
 
-	memset(tszBuffer, 0, sizeof(tszBuffer));
+	memset(wszBuffer, 0, sizeof(wszBuffer));
 	if(value)
-		_stprintf(tszBuffer, _T("%s"), _T("true"));
+		_swprintf(wszBuffer, L"%s", L"true");
 	else
-		_stprintf(tszBuffer, _T("%s"), _T("false"));
-	return SetString(section, key, tszBuffer);
+		_swprintf(wszBuffer, L"%s", L"false");
+	return SetString(wszSection, wszKey, wszBuffer);
 }

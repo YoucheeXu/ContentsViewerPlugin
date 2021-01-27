@@ -15,64 +15,97 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ContentsListView.cpp">
+    <ClCompile Include="..\src\ContentsListView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ContentsViewerDialog.cpp">
+    <ClCompile Include="..\src\ContentsViewerDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ContentsViewerPlugin.cpp">
+    <ClCompile Include="..\src\Document.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\help.cpp">
+    <ClCompile Include="..\src\help.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\IniFile.cpp">
+    <ClCompile Include="..\src\IniFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Document.cpp">
+    <ClCompile Include="..\src\ScriptPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\LogFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DllMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Plugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\Win32InputBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ContentsViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ContentsListView.h">
+    <ClInclude Include="..\src\ContentsListView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ContentsViewerDialog.h">
+    <ClInclude Include="..\src\ContentsViewerDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ContentsViewerPlugin.h">
+    <ClInclude Include="..\src\Document.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\help.h">
+    <ClInclude Include="..\src\help.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\IniFile.h">
+    <ClInclude Include="..\src\IniFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LogFile.h">
+    <ClInclude Include="..\src\LogFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PluginInterface.h">
+    <ClInclude Include="..\src\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\resource.h">
+    <ClInclude Include="..\src\ScriptPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Document.h">
+    <ClInclude Include="..\src\AboutBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ContentsViewerMsgs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\enum_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\Win32InputBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ContentsViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\NPP\PluginInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="src\resource.rc">
+    <ResourceCompile Include="..\src\resource.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\res\ContentsViewer.bmp">
+    <Image Include="..\src\res\ContentsViewer.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\res\Toolbar.bmp">
+    <Image Include="..\src\res\Toolbar.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

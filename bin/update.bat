@@ -1,4 +1,4 @@
-::mshta vbscript:msgbox("提示内容1",1,"提示窗口1")(window.close)
+@::mshta vbscript:msgbox("提示内容1",1,"提示窗口1")(window.close)
 
 %1 %2
 ver|find "5.">nul&&goto :st
@@ -9,15 +9,24 @@ pause
 
 taskkill /F /IM notepad++.exe
 
+:del
+
+set CVPPath=\Notepad++\plugins\config\ContentsViewerPlugin
+
+set cfgPath=%AppData%%CVPPath%
+
+del /f/s/q %cfgPath%\*.*
+rd /s/q %cfgPath%\ScriptFiles
 
 cd /d %~dp0
-::copy /y ContentsViewerPlugin.dll %ProgramFiles%\Notepad++\plugins\
-REM copy /y ContentsViewerPlugin.dll C:\"Program Files"\"Notepad++"\plugins
+
+:cp
 copy /y ContentsViewerPlugin.dll C:\"Program Files (x86)"\"Notepad++"\plugins\ContentsViewerPlugin
-rem copy /y ContentsViewerPlugin.ini C:\"Program Files"\"Notepad++"\plugins\Config
+xcopy /y ScriptPlugin\*.dll C:\"Program Files (x86)"\"Notepad++"\plugins\ContentsViewerPlugin\ScriptPlugin
 
-rem start C:\"Program Files"\"Notepad++"\Notepad++.exe
+xcopy /y ContentsViewerPlugin\*.ini %cfgPath%
+xcopy /e/y/i ContentsViewerPlugin\ScriptFiles\* %cfgPath%\ScriptFiles
 
-ping -n 6 127.1 
+REM start C:\"Program Files (x86)"\"Notepad++"\Notepad++.exe
 
-::pause
+ping -n 6 127.1
