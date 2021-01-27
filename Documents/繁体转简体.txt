@@ -1,0 +1,263 @@
+c++代码要用到 “繁体简体映射表”博文中的映射表  
+表中的数据形式：
+殯,殡
+臏,膑
+髕,髌
+髩,鬓
+...
+
+
+第一步：将映射表中的简体读入数组中。
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <map>
+using namespace std;
+
+
+const int MAX_LENGTH = 65535;
+//数组map_array 用于存储繁体所对应的简体字符
+string map_array[MAX_LENGTH] = {""}; 
+
+
+void init_map_array()
+{
+	map<string, int> line_map;
+	ifstream fin;
+	fin.open("繁体简体映射表");
+	char line[1024];
+	unsigned short simple_word;
+	int  index;
+	unsigned char ch1;
+	unsigned char ch2;
+	int i=0;
+	while(!fin.eof())
+	{
+		index = 0;
+		fin.getline(line,1023);
+		if(strlen(line) == 0)
+			continue;
+		//去掉映射表中重复的列
+		if(line_map.find(line) != line_map.end())
+			continue;
+		line_map.insert(pair<string, int>(line, 1));
+		ch1 = line[0];
+		ch2 = line[1];
+		//繁体的编码映射成对应的简体在map_array中的下标。
+		index = (int)ch1 * 256;
+		index = index + ch2;
+		string strline = line;
+		if(map_array[index].length()!=0)
+		{
+			//一个繁体对应多个简体的情况。
+			string tmp = map_array[index];
+			tmp = tmp + "," + strline.substr(3);
+			map_array[index] = tmp;
+			//cout << "有冲突:" << strline.substr(0,2) << tmp << endl;;
+			continue;
+		}
+		map_array[index] = strline.substr(3);
+	}
+	fin.close();
+}
+
+
+string regular_tranf_simple(char* regular_str)
+{
+	if(strlen(regular_str)<2)
+	return 0;
+	unsigned char ch1,ch2;
+	//计算繁体对应的简体在map_array 中的下标
+	char* locale_regular = regular_str;
+	ch1 = *locale_regular++;
+	ch2 = *locale_regular;
+	int index = (short)ch1*256;
+	index = index + ch2; 
+	if(index >= MAX_LENGTH)
+	return 0;
+	string simple_word = map_array[index];
+	return simple_word;
+}
+测试程序：
+int main(int argc, char* argv)
+{
+	init_map_array();
+	char regular_str[3] = "綵";
+	string simple_str;
+	simple_str = regular_tranf_simple(regular_str);
+	cout << regular_str << "=>" << simple_str << endl;
+}
+输出：綵=>彩,采
+
+
+
+简体和繁体内码互转的C++代码
+
+
+CString CChineseCodeLib::Big5ToGBK(LPCTSTR strBig5)
+{ 
+	char* pszBig5=NULL; //Big5编码的字符 
+	wchar_t* wszUnicode=NULL; //Unicode编码的字符 
+	char* pszGbt=NULL; //Gb编码的繁体字符 
+	char* pszGbs=NULL; //Gb编码的简体字符 
+	CString strGBK; //返回的字符串 
+	int iLen=0; //需要转换的字符数 
+	pszBig5=(LPTSTR)strBig5; //读入需要转换的字符参数 
+	//计算转换的字符数 
+	iLen=MultiByteToWideChar (950, 0, pszBig5, -1, NULL,0) ; 
+	//给wszUnicode分配内存 
+	wszUnicode=new wchar_t[iLen+1]; 
+	//转换Big5码到Unicode码，使用了API函数MultiByteToWideChar 
+	MultiByteToWideChar (950, 0, pszBig5, -1, wszUnicode,iLen); 
+	//计算转换的字符数 
+	iLen=WideCharToMultiByte (936, 0, (PWSTR) wszUnicode, -1, NULL,0, NULL, NULL) ; 
+	//给pszGbt分配内存 
+	pszGbt=new char[iLen+1]; 
+	//给pszGbs分配内存 
+	pszGbs=new char[iLen+1]; 
+	//转换Unicode码到Gb码繁体，使用API函数WideCharToMultiByte 
+	WideCharToMultiByte (936, 0, (PWSTR) wszUnicode, -1, pszGbt,iLen, NULL, NULL) ; 
+	//转换Gb码繁体到Gb码简体，使用API函数LCMapString 
+	LCMapString(0x0804, LCMAP_SIMPLIFIED_CHINESE, pszGbt, -1, pszGbs, iLen); 
+	//返回Gb码简体字符 
+	strGBK=pszGbs; 
+	//释放内存 
+	delete [] wszUnicode; 
+	delete [] pszGbt; 
+	delete [] pszGbs;
+
+	return strGBK; 
+} 
+
+CString CChineseCodeLib::GBKToBig5(LPCTSTR strGBK)
+{
+	char* pszGbt=NULL; //Gb编码的繁体字符
+	char* pszGbs=NULL; //Gb编码的简体字符
+	wchar_t* wszUnicode=NULL; //Unicode编码的字符
+	char* pszBig5=NULL; //Big5编码的字符
+	int iLen=0; //需要转换的字符数
+	CString strBig5; //返回的字符串
+
+	pszGbs=(char*)strGBK; //读入需要转换的字符参数
+
+	//计算转换的字符数
+	iLen=MultiByteToWideChar (936, 0, pszGbs, -1, NULL,0) ;
+
+	//给pszGbt分配内存
+	pszGbt=new char[iLen*2+1];
+	//转换Gb码简体到Gb码繁体，使用API函数LCMapString
+	LCMapString(0x0804, LCMAP_TRADITIONAL_CHINESE, pszGbs, -1, pszGbt, iLen*2);
+
+	//给wszUnicode分配内存
+	wszUnicode=new wchar_t[iLen+1];
+	//转换Gb码到Unicode码，使用了API函数MultiByteToWideChar
+	MultiByteToWideChar (936, 0, pszGbt, -1, wszUnicode,iLen);
+
+	//计算转换的字符数
+	iLen=WideCharToMultiByte (950, 0, (PWSTR) wszUnicode, -1, NULL,0, NULL, NULL) ;
+	//给pszBig5分配内存
+	pszBig5=new char[iLen+1];
+	//转换Unicode码到Big5码，使用API函数WideCharToMultiByte
+	WideCharToMultiByte (950, 0, (PWSTR) wszUnicode, -1, pszBig5,iLen, NULL, NULL) ;
+
+	//返回Big5码字符
+	strBig5 = pszBig5;
+
+	//释放内存
+	delete [] wszUnicode;
+	delete [] pszGbt;
+	delete [] pszBig5;
+
+	return strBig5;
+}
+
+
+WORD wLanguageID = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
+LCID Locale = MAKELCID(wLanguageID, SORT_CHINESE_PRC );
+LCMapString(Locale, LCMAP_SIMPLIFIED_CHINESE, "測試", -1, szText, 256 ); 
+
+LCMapString函数
+　　The LCMapString function either maps an input character string to another using a specified transformation or generates a sort key for the input string.
+　　定义
+　　int LCMapString(LCID Locale, DWORD dwMapFlags, LPCTSTR lpSrcStr, int cchSrc, LPTSTR lpDestStr, int cchDest);
+　　参数
+　　Locale [in] 
+　　Specifies a locale identifier. The locale provides a context for the string mapping or sort key generation. An application can use the MAKELCID macro to create a locale identifier.
+
+　　dwMapFlags [in] 
+　　Specifies the type of transformation used during string mapping or the type of sort key generated. An application can specify one or more of the following options. Restrictions are noted following the table.
+　　LCMAP_BYTEREV - Windows NT/2000/XP: Use byte reversal. For example, if you pass in 0x3450 0x4822 the result is 0x5034 0x2248.
+　　LCMAP_FULLWIDTH - Uses wide characters (where applicable).
+　　LCMAP_HALFWIDTH - Uses narrow characters (where applicable).
+　　LCMAP_HIRAGANA - Hiragana.
+　　LCMAP_KATAKANA - Katakana.
+　　LCMAP_LINGUISTIC_CASING - Uses linguistic rules for casing, rather than file system rules (the default). Valid with LCMAP_LOWERCASE or LCMAP_UPPERCASE only.
+　　LCMAP_LOWERCASE - Uses lowercase.
+　　LCMAP_SIMPLIFIED_CHINESE - Windows NT 4.0 and later: Maps traditional Chinese characters to simplified Chinese characters.
+　　LCMAP_SORTKEY - Produces a normalized wide charactersort key. For more information, see lpDestStr and Remarks.
+　　LCMAP_TRADITIONAL_CHINESE - Windows NT 4.0 and later: Maps simplified Chinese characters to traditional Chinese characters.
+　　LCMAP_UPPERCASE - Uses uppercase.
+　　The following flags are used only with the LCMAP_SORTKEY flag. Flag Meaning
+　　NORM_IGNORECASE - Ignores case.
+　　NORM_IGNOREKANATYPE - Does not differentiate between Hiragana and Katakana characters. Corresponding Hiragana and Katakana will compare as equal.
+　　NORM_IGNORENONSPACE - Ignores nonspacing. This flag also removes Japanese accent characters.
+　　NORM_IGNORESYMBOLS - Ignores symbols.
+　　NORM_IGNOREWIDTH - Does not differentiate between a single-byte character and the same character as a double-byte character.
+　　SORT_STRINGSORT - Treats punctuation the same as symbols.
+　
+　　If the LCMAP_SORTKEY flag is not specified, the LCMapString function performs string mapping. In this case the following restrictions apply:
+　　- LCMAP_LOWERCASE and LCMAP_UPPERCASE are mutually exclusive.
+　　- LCMAP_HIRAGANA and LCMAP_KATAKANA are mutually exclusive.
+　　- LCMAP_HALFWIDTH and LCMAP_FULLWIDTH are mutually exclusive.
+　　- LCMAP_TRADITIONAL_CHINESE and LCMAP_SIMPLIFIED_CHINESE are mutually exclusive.
+　　- LCMAP_LOWERCASE and LCMAP_UPPERCASE are not valid in combination with any of these flags: LCMAP_HIRAGANA, - LCMAP_KATAKANA, LCMAP_HALFWIDTH, LCMAP_FULLWIDTH.
+　　When the LCMAP_SORTKEY flag is specified, the LCMapString function generates a sort key. In this case the following restriction applies:
+　　- LCMAP_SORTKEY is mutually exclusive with all other LCMAP_* flags, with the sole exception of LCMAP_BYTEREV.
+
+　　lpSrcStr [in]
+　　Pointer to a source string that the function maps or uses for sort key generation.
+
+　　cchSrc [in] 
+　　Specifies the number of TCHARs in the string pointed to by the lpSrcStr parameter.
+　　This count can include the NULL terminator, or not include it. If the NULL terminator is included in the character count, it does not greatly affect the mapping behavior. That is because NULL is considered to be unsortable, and always maps to itself.
+　　A cchSrc value of any negative value specifies that the string pointed to by lpSrcStr is null-terminated. If this is the case, and LCMapString is being used in its string-mapping mode, the function calculates the string's length itself, and null-terminates the mapped string stored into *lpDestStr.
+
+　　lpDestStr [out] 
+　　Pointer to a buffer that receives the mapped string or sort key.
+　　If LCMAP_SORTKEY is specified, LCMapString stores a sort key into the buffer. The sort key is stored as an array of byte values in the following format:
+　　[all Unicode sort weights] 0x01 [all Diacritic weights] 0x01 [all Case weights] 0x01 [all Special weights] 0x00
+　　Note that the sort key is null-terminated. This is true regardless of the value of cchSrc. Also note that, even if some of the sort weights are absent from the sort key, due to the presence of one or more ignore flags in dwMapFlags, the 0x01 separators and the 0x00 terminator are still present.
+
+　　cchDest [in]
+　　Specifies the size, in TCHARs, of the buffer pointed to by lpDestStr.
+　　If the function is being used for string mapping, the size is a character count. If space for a NULL terminator is included in cchSrc, then cchDest must also include space for a NULL terminator.
+　　If the function is being used to generate a sort key, the size is a byte count. This byte count must include space for the sort key 0x00 terminator.
+　　If cchDest is zero, the function's return value is the number of characters, or bytes if LCMAP_SORTKEY is specified, required to hold the mapped string or sort key. In this case, the buffer pointed to by lpDestStr is not used.
+　
+　　返回值
+　　If the function succeeds, and the value of cchDest is nonzero, the return value is the number of characters, or bytes if LCMAP_SORTKEY is specified, written to the buffer. This count includes room for a NULL terminator.
+　　If the function succeeds, and the value of cchDest is zero, the return value is the size of the buffer in characters, or bytes if LCMAP_SORTKEY is specified, required to receive the translated string or sort key. This size includes room for a NULL terminator.
+　　If the function fails, the return value is 0. To get extended error information, call GetLastError. GetLastError may return one of the following error codes:
+　　ERROR_INSUFFICIENT_BUFFER
+　　ERROR_INVALID_FLAGS
+　　ERROR_INVALID_PARAMETER
+　　说明
+　　The mapped string is null terminated if the source string is null terminated.
+　　The ANSI version of this function maps strings to and from Unicode based on the specified LCID&amp;apos;s default ANSI code page.
+　　For the ANSI version of this function, the LCMAP_UPPERCASE flag produces the same result as CharUpper in the locale. Likewise, the LCMAP_LOWERCASE flag produces the same result as CharLower. This function always maps a single character to a single character. Note that, in these cases, the function maps the lowercase I to the uppercase I, even when the current language is Turkish or Azeri. To change this for Turkish and Azeri, specify LCMAP_LINGUISTIC_CASING.
+　　Note: When the ANSI version of this function is used with a Unicode-only LCID, the call can succeed because the system uses the system code page. However, characters that are undefined in the system code page appears in the string as a question mark (?). To determine which LCIDs are Unicode-only, see Table of Language Identifiers.
+　　If LCMAP_UPPERCASE or LCMAP_LOWERCASE is set and if LCMAP_SORTKEY is not set, the lpSrcStr and lpDestStr pointers can be the same. Otherwise, the lpSrcStr and lpDestStr pointers must not be the same. If they are the same, the function fails, and GetLastError returns ERROR_INVALID_PARAMETER.
+　　If the LCMAP_HIRAGANA flag is specified to map Katakana characters to Hiragana characters, and LCMAP_FULLWIDTH is not specified, the function only maps full-width characters to Hiragana. In this case, any half-width Katakana characters are placed as-is in the output string, with no mapping to Hiragana. An application must specify LCMAP_FULLWIDTH if it wants half-width Katakana characters mapped to Hiragana.
+　　Even if the Unicode version of this function is called, the output string is only in WCHAR or CHAR format if the string mapping mode of LCMapString is used. If the sort key generation mode is used, specified by LCMAP_SORTKEY, the output is an array of byte values. To compare sort keys, use a byte-by-byte comparison.
+　　An application can call the function with the NORM_IGNORENONSPACE and NORM_IGNORESYMBOLS flags set, and all other options flags cleared, in order to simply strip characters from the input string. If this is done with an input string that is not null-terminated, it is possible for LCMapString to return an empty string and not return an error.
+　　The LCMapString function ignores the Arabic Kashida. If an application calls the function to create a sort key for a string containing an Arabic Kashida, there will be no sort key value for the Kashida.
+　　The function treats the hyphen and apostrophe a bit differently than other punctuation symbols, so that words like coop and co-op stay together in a list. All punctuation symbols other than the hyphen and apostrophe sort before the alphanumeric characters. An application can change this behavior by setting the SORT_STRINGSORT flag. See CompareString for a more detailed discussion of this issue.
+　　When LCMapString is used to generate a sort key, by setting the LCMAP_SORTKEY flag, the sort key stored into *lpDestStr may contain an odd number of bytes. The LCMAP_BYTEREV option only reverses an even number of bytes. If both options are chosen, the last (odd-positioned) byte in the sort key is not reversed. If the terminating 0x00 byte is an odd-positioned byte, then it remains the last byte in the sort key. If the terminating 0x00 byte is an even-positioned byte, it exchanges positions with the byte that precedes it.
+　　When LCMAP_SORTKEY flag is specified, the function generates a sort key that, when used in strcmp, produces the same order as when the original string is used in CompareString. When LCMAP_SORTKEY flag is specified, the output string is a string, but the character values are not meaningful display values.
+　　Windows 95/98/Me: LCMapStringW is supported by the Microsoft Layer for Unicode. To use this, you must add certain files to your application, as outlined in Microsoft Layer for Unicode on Windows 95/98/Me Systems.
+　　系统要求
+　　Windows NT/2000/XP: Included in Windows NT 3.1 or later.
+　　Windows 95/98/Me: Included in Windows 95 or later.
+　　Header: Declared in Winnls.h; include Windows.h.
+　　Library: Use Kernel32.lib.
+　　Unicode: Implemented as Unicode and ANSI versions on Windows NT/2000/XP. Also supported by Microsoft Layer for Unicode.
