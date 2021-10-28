@@ -1,4 +1,4 @@
-//PyScriptInterface.h
+// PyScript.h
 #pragma once
 #ifndef _PYSCRIPT_H_
 #define _PYSCRIPT_H_

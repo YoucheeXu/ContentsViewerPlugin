@@ -1,4 +1,4 @@
-//PyScriptPlugin.h
+// PyScriptPlugin.h
 #pragma once
 #ifndef _PYSCRIPTPLUGIN_H_
 #define _PYSCRIPTPLUGIN_H_

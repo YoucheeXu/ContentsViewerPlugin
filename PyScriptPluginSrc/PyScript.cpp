@@ -1,4 +1,4 @@
-//PyScript.cpp
+// PyScript.cpp
 
 #define PY_SSIZE_T_CLEAN		  // Make "s#" use Py_ssize_t rather than int.
 #include <Python.h>

@@ -13,7 +13,7 @@ using namespace std;
 
 // global vars
 //bool g_bDebug;
-CLogFile* g_pLogFile;
+CLogFile *g_pLogFile;
 
 //static HBITMAP s_hContentsViewerBitmap = NULL;
 
@@ -38,10 +38,10 @@ void CContentsViewer::Initialize(HINSTANCE hInstance)
 {
 	SetResourceHandle(hInstance);
 	m_hTabIcon = (HICON)::LoadImage(hInstance,
-		MAKEINTRESOURCE(IDB_CONTENTSVIEWER), IMAGE_BITMAP, 0, 0,
-		LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT);
+									MAKEINTRESOURCE(IDB_CONTENTSVIEWER), IMAGE_BITMAP, 0, 0,
+									LR_LOADMAP3DCOLORS | LR_LOADTRANSPARENT);
 	//m_TB_Icon.hToolbarBmp = (HBITMAP)::LoadImage(hInstance,
-	// MAKEINTRESOURCE(IDB_TAGSVIEW), IMAGE_BITMAP, 0, 0, 
+	// MAKEINTRESOURCE(IDB_TAGSVIEW), IMAGE_BITMAP, 0, 0,
 	// LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS);
 
 	/*s_hContentsViewerBitmap = (HBITMAP)::LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP_JSONVIEW), IMAGE_BITMAP,
@@ -88,7 +88,7 @@ HWND CContentsViewer::GetCVDlgHWnd()
 	return m_CVDlg.GetHwnd();
 }
 
-void CContentsViewer::SetNPPData(const NPPData& nppd)
+void CContentsViewer::SetNPPData(const NPPData &nppd)
 {
 	m_NPPData = nppd;
 	//m_CVDlg.SetNPPWnd(nppd._nppHandle);
@@ -105,7 +105,7 @@ HWND CContentsViewer::GetEditHWnd() const
 		assert(NULL);
 		return NULL;
 	}
-	return ((nCurrentView == 0)? m_NPPData._scintillaMainHandle: m_NPPData._scintillaSecondHandle);
+	return ((nCurrentView == 0) ? m_NPPData._scintillaMainHandle : m_NPPData._scintillaSecondHandle);
 }
 
 //NPPN_BUFFERACTIVATED
@@ -115,7 +115,8 @@ void CContentsViewer::OnFileActivated()
 	{
 		m_hSciEdit = GetEditHWnd();
 		//if(IsCVDlgVisable()) thePlugin.ReParseCurFile();
-		if(IsCVDlgVisable()) ParseCurFile();
+		if (IsCVDlgVisable())
+			ParseCurFile();
 	}
 }
 
@@ -152,7 +153,8 @@ void CContentsViewer::OnNPPTBModification()
 	//HWND hNppToolbar = NppToolbarHandleGetter::get();
 
 	UINT style = (LR_SHARED | LR_LOADTRANSPARENT | LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS);
-	m_tbiJS.hToolbarBmp = (HBITMAP)::LoadImage(GetInstanceHandle(), MAKEINTRESOURCE(IDB_CONTENTSVIEWER), IMAGE_BITMAP, 0, 0, style);;
+	m_tbiJS.hToolbarBmp = (HBITMAP)::LoadImage(GetInstanceHandle(), MAKEINTRESOURCE(IDB_CONTENTSVIEWER), IMAGE_BITMAP, 0, 0, style);
+	;
 	m_tbiJS.hToolbarIcon = m_hTabIcon;
 	SendNPPMsg(NPPM_ADDTOOLBARICON, (WPARAM)funcItem[action_index[Action::openContentsViewerDlg]]._cmdID, (LPARAM)&m_tbiJS);
 	//SendNPPMsg(NPPM_ADDTOOLBARICON, (WPARAM)funcItem[5]._cmdID, (LPARAM)&m_hTabIcon);
@@ -171,25 +173,27 @@ void CContentsViewer::OnSelectionChanged()
 {
 }
 
-LRESULT CContentsViewer::SendNPPMsg(UINT uMsg, WPARAM wParam , LPARAM lParam) const
+LRESULT CContentsViewer::SendNPPMsg(UINT uMsg, WPARAM wParam, LPARAM lParam) const
 {
 	return ::SendMessage(m_NPPData._nppHandle, uMsg, wParam, lParam);
 }
 
-LRESULT CContentsViewer::SendNPPMsg(UINT uMsg, WPARAM wParam , LPARAM lParam)
+LRESULT CContentsViewer::SendNPPMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return ::SendMessage(m_NPPData._nppHandle, uMsg, wParam, lParam);
 }
 
-LRESULT CContentsViewer::SendSciMsg(UINT uMsg, WPARAM wParam , LPARAM lParam) const
+LRESULT CContentsViewer::SendSciMsg(UINT uMsg, WPARAM wParam, LPARAM lParam) const
 {
-	if(NULL == m_hSciEdit) return FALSE;	
+	if (NULL == m_hSciEdit)
+		return FALSE;
 	return ::SendMessage(m_hSciEdit, uMsg, wParam, lParam);
 }
 
-LRESULT CContentsViewer::SendSciMsg(UINT uMsg, WPARAM wParam , LPARAM lParam)
+LRESULT CContentsViewer::SendSciMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if(NULL == m_hSciEdit) return FALSE;
+	if (NULL == m_hSciEdit)
+		return FALSE;
 	return ::SendMessage(m_hSciEdit, uMsg, wParam, lParam);
 }
 
@@ -214,7 +218,7 @@ void CContentsViewer::GotoLine(int nLine)
 	//::SendMessage(hSciEdit, SCI_ENSUREVISIBLE, nLine - 1, 0);
 
 	//LOGOUT("DesLine: %d\n", nLine);
-	
+
 	int nCurLineNum = GetCurLineNum();
 	LOGOUT("curLineNo: %d\n", nCurLineNum);
 	//int firstVisibleLine = 0;
@@ -253,7 +257,7 @@ void CContentsViewer::DelLine(int nLine)
 	nLine = nLine - 1;
 	int nPos = (int)SendSciMsg(SCI_POSITIONFROMLINE, nLine);
 	unsigned int uLen = SendSciMsg(SCI_GETLINE, nLine);
-	SendSciMsg(SCI_DELETERANGE, nPos, uLen);	
+	SendSciMsg(SCI_DELETERANGE, nPos, uLen);
 }
 
 void CContentsViewer::CutLines(int nLineStart, int nLineEnd)
@@ -272,10 +276,10 @@ void CContentsViewer::PasteBeforeLine(int nLine)
 	SendSciMsg(SCI_PASTE);
 }
 
-void CContentsViewer::ReplaceLine(int nLine, const wchar_t* wszTxt)
+void CContentsViewer::ReplaceLine(int nLine, const wchar_t *wszTxt)
 {
-	string aLine = TtoA(wszTxt, m_nCodePage);
-	char* szLine = const_cast<char*>(aLine.c_str());
+	string aLine = WtoA(wszTxt, m_nCodePage);
+	char *szLine = const_cast<char *>(aLine.c_str());
 
 	int nStartPos = SendSciMsg(SCI_POSITIONFROMLINE, nLine - 1);
 	//int currentPos = SendSciMsg(SCI_POSITIONFROMLINE, nLine + 1);
@@ -301,7 +305,7 @@ void CContentsViewer::ReParseCurFile()
 	ParseCurFile();
 }
 
-int CContentsViewer::IndexContents(const wchar_t* wszText, const wchar_t* wszKeyword, int nLevel)
+int CContentsViewer::IndexContents(const wchar_t *wszText, const wchar_t *wszKeyword, int nLevel)
 {
 	int nSearchFlags = SCFIND_REGEXP + SCFIND_POSIX;
 	//int searchFlags = SCFIND_MATCHCASE;
@@ -313,7 +317,7 @@ int CContentsViewer::IndexContents(const wchar_t* wszText, const wchar_t* wszKey
 	aTTF.chrg.cpMin = 0;
 	aTTF.chrg.cpMax = SendSciMsg(SCI_GETLENGTH);
 
-	string aText = TtoA(wszText, m_nCodePage);
+	string aText = WtoA(wszText, m_nCodePage);
 
 	//int lenText = text.length();
 
@@ -321,7 +325,7 @@ int CContentsViewer::IndexContents(const wchar_t* wszText, const wchar_t* wszKey
 	//memset(lpstrText, 0, 256);
 	//strcpy(lpstrText, text.c_str());
 
-	aTTF.lpstrText = const_cast<char*>(aText.c_str());
+	aTTF.lpstrText = const_cast<char *>(aText.c_str());
 	//ttf.lpstrText = lpstrText;
 	//ttf.lpstrText = szText;
 
@@ -331,10 +335,11 @@ int CContentsViewer::IndexContents(const wchar_t* wszText, const wchar_t* wszKey
 
 	wstring wContent;
 
-	do{
+	do
+	{
 		nPos = SendSciMsg(SCI_FINDTEXT, nSearchFlags, (LPARAM)&aTTF);
 
-		if(nPos != -1)
+		if (nPos != -1)
 		{
 			i++;
 			//LOGINFO(_T("Content is found at Pos: %d\n"), nPos);
@@ -347,24 +352,23 @@ int CContentsViewer::IndexContents(const wchar_t* wszText, const wchar_t* wszKey
 
 			SendSciMsg(SCI_GETLINE, nLine, (LPARAM)szText);
 
-			wContent = AtoT(szText, m_nCodePage);
+			wContent = AtoW(szText, m_nCodePage);
 
 			StringTrimLeft(wContent);
 			StringTrimRight(wContent);
 			m_CVDlg.AddContent(i, wContent.c_str(), nLine + 1, nLevel, wszKeyword);
-			delete [] szText;
-
+			delete[] szText;
 		}
-	}while(nPos != -1);
+	} while (nPos != -1);
 
 	return i;
 }
 
-void  CContentsViewer::ActiveContentListviewItem()
+void CContentsViewer::ActiveContentListviewItem()
 {
-	if(IsCVDlgExist())
+	if (IsCVDlgExist())
 	{
-		if(IsCVDlgVisable())
+		if (IsCVDlgVisable())
 		{
 			int nLine = GetCurLineNum();
 			m_CVDlg.FocuseContentListviewItemByLine(nLine);
@@ -382,7 +386,7 @@ void  CContentsViewer::ActiveContentListviewItem()
  * return: int  -- number of find and replace
 *******************************************************************************/
 //wait to test
-int CContentsViewer::FindAndReplace(const wchar_t* wszFind, const wchar_t* wszReplace, bool bRegularMode)
+int CContentsViewer::FindAndReplace(const wchar_t *wszFind, const wchar_t *wszReplace, bool bRegularMode)
 {
 	LOGINFO(L"Find: %s, Replace: %s. regularMode: %d.", wszFind, wszReplace, bRegularMode);
 
@@ -393,9 +397,9 @@ int CContentsViewer::FindAndReplace(const wchar_t* wszFind, const wchar_t* wszRe
 	#define SCFIND_WORDSTART 0x00100000
 	#define SCFIND_REGEXP 0x00200000
 	#define SCFIND_POSIX 0x00400000*/
-	if(true == bRegularMode)
+	if (true == bRegularMode)
 		nSearchFlags = SCFIND_REGEXP + SCFIND_POSIX;
-		//searchFlags = SCFIND_CXX11REGEX;
+	//searchFlags = SCFIND_CXX11REGEX;
 	else
 		//searchFlags = SCFIND_WORDSTART;
 		nSearchFlags = SCFIND_MATCHCASE;
@@ -407,9 +411,9 @@ int CContentsViewer::FindAndReplace(const wchar_t* wszFind, const wchar_t* wszRe
 	aTTF.chrg.cpMin = 0;
 	aTTF.chrg.cpMax = SendSciMsg(SCI_GETLENGTH);
 
-	string aFind = TtoA(wszFind, m_nCodePage);
+	string aFind = WtoA(wszFind, m_nCodePage);
 
-	string aReplace = TtoA(wszReplace, m_nCodePage);
+	string aReplace = WtoA(wszReplace, m_nCodePage);
 
 	//char* szReplace = const_cast<char*>(sReplace.c_str());
 
@@ -417,16 +421,16 @@ int CContentsViewer::FindAndReplace(const wchar_t* wszFind, const wchar_t* wszRe
 
 	int nFindLen = wcslen(wszFind);
 	int nReplaceLen = wcslen(wszReplace);
-	
+
 	LOGINFO("nFindLen: %d, nReplaceLen: %d.", nFindLen, nReplaceLen);
-	
-	aTTF.lpstrText = const_cast<char*>(aFind.c_str());
+
+	aTTF.lpstrText = const_cast<char *>(aFind.c_str());
 
 	do
 	{
 		nPos = SendSciMsg(SCI_FINDTEXT, nSearchFlags, (LPARAM)&aTTF);
 
-		if(nPos != -1)
+		if (nPos != -1)
 		{
 			nCount++;
 			LOGINFO("found in pos: %d", nPos);
@@ -441,7 +445,7 @@ int CContentsViewer::FindAndReplace(const wchar_t* wszFind, const wchar_t* wszRe
 
 			aTTF.chrg.cpMin = nPos - nReplaceLen;
 		}
-	}while(nPos != -1);
+	} while (nPos != -1);
 
 	LOGINFO("%d was found and replaced!", nCount);
 
@@ -453,13 +457,13 @@ bool CContentsViewer::SelectLines(int nFromline, int nEndline)
 	int nCurrentPos = SendSciMsg(SCI_POSITIONFROMLINE, nFromline - 1);
 
 	int nAnchorPos = SendSciMsg(SCI_POSITIONFROMLINE, nEndline - 1);
-	
+
 	SendSciMsg(SCI_SETSEL, nCurrentPos, nAnchorPos);
 
-	return true;	
+	return true;
 }
 
-int CContentsViewer::GetLine(int nLine, wstring& wLine)
+int CContentsViewer::GetLine(int nLine, wstring &wLine)
 {
 	int nLen = SendSciMsg(SCI_GETLINE, nLine - 1);
 
@@ -468,12 +472,12 @@ int CContentsViewer::GetLine(int nLine, wstring& wLine)
 
 	SendSciMsg(SCI_GETLINE, nLine - 1, (LPARAM)szText);
 
-	wLine = AtoT(szText, m_nCodePage);
+	wLine = AtoW(szText, m_nCodePage);
 
 	int nLinelen = wcslen(wLine.c_str());
 
 	LOGINFO(L"curretn nLine : %s", wLine.c_str());
-	delete [] szText;
+	delete[] szText;
 
 	return nLinelen + 1;
 }
@@ -487,40 +491,40 @@ bool CContentsViewer::GetSelection(wstring &wStr)
 {
 	int nLen = SendSciMsg(SCI_GETSELTEXT);
 
-	char* szText = new char[nLen];
+	char *szText = new char[nLen];
 	SendSciMsg(SCI_GETSELTEXT, NULL, (LPARAM)szText);
 
-	wStr = AtoT(szText, m_nCodePage);
-	delete [] szText;
+	wStr = AtoW(szText, m_nCodePage);
+	delete[] szText;
 	return true;
 }
 
-bool CContentsViewer::ReplaceSelection(const wchar_t* wszStr)
+bool CContentsViewer::ReplaceSelection(const wchar_t *wszStr)
 {
-	string aStr = TtoA(wszStr, m_nCodePage);
+	string aStr = WtoA(wszStr, m_nCodePage);
 
 	SendSciMsg(SCI_REPLACESEL, NULL, (LPARAM)aStr.c_str());
 
 	return true;
 }
 
-bool CContentsViewer::GetDocument(wstring& wDoc)
+bool CContentsViewer::GetDocument(wstring &wDoc)
 {
 	int nLen = SendSciMsg(SCI_GETTEXT);
 
-	char* szText = new char[nLen + 1];
+	char *szText = new char[nLen + 1];
 	SendSciMsg(SCI_GETTEXT, (WPARAM)(nLen + 1), (LPARAM)szText);
 
-	wDoc = AtoT(szText, m_nCodePage);
+	wDoc = AtoW(szText, m_nCodePage);
 	delete[] szText;
 	return true;
 }
 
-bool CContentsViewer::SetDocument(const wchar_t* wszDoc)
+bool CContentsViewer::SetDocument(const wchar_t *wszDoc)
 {
 	// int len = SendSciMsg(SCI_GETLENGTH, 0, 0);
 
-	string aText = TtoA(wszDoc, m_nCodePage);
+	string aText = WtoA(wszDoc, m_nCodePage);
 
 	SendSciMsg(SCI_SETTEXT, NULL, (LPARAM)aText.c_str());
 
@@ -548,19 +552,19 @@ bool CContentsViewer::SetDocument(const wchar_t* wszDoc)
 //	delete[] tmb;
 //}
 
-void CContentsViewer::GetNPPDirectory(wchar_t* wszNPPDir)
+void CContentsViewer::GetNPPDirectory(wchar_t *wszNPPDir)
 {
 	SendNPPMsg(NPPM_GETNPPDIRECTORY, (WPARAM)MAX_PATH, (LPARAM)wszNPPDir);
 	PrintDebugString(L"nppDir: %s", wszNPPDir);
 }
 
-void CContentsViewer::GetPluginsDir(wchar_t* wszPluginsDir)
+void CContentsViewer::GetPluginsDir(wchar_t *wszPluginsDir)
 {
 	SendNPPMsg(NPPM_GETNPPDIRECTORY, (WPARAM)MAX_PATH, (LPARAM)wszPluginsDir);
 	PrintDebugString(L"pluginsConfDir: %s", wszPluginsDir);
 }
 
-void CContentsViewer::GetPluginsConfigDir(wchar_t* wszPluginsCfgDir)
+void CContentsViewer::GetPluginsConfigDir(wchar_t *wszPluginsCfgDir)
 {
 	SendNPPMsg(NPPM_GETPLUGINSCONFIGDIR, (WPARAM)MAX_PATH, (LPARAM)wszPluginsCfgDir);
 	PrintDebugString(L"pluginsConfDir: %s", wszPluginsCfgDir);
@@ -616,11 +620,11 @@ void CContentsViewer::trigerAction(UINT uID)
 	}
 	else
 	{
-		 ::MessageBox(
-			 m_hMainWnd,
-			 L"Please open contents viewer plugin first!",
-			 NPP_PLUGIN_NAME,
-			 MB_OK);
+		::MessageBoxW(
+			m_hMainWnd,
+			L"Please open contents viewer plugin first!",
+			NPP_PLUGIN_NAME,
+			MB_OK);
 	}
 }
 

@@ -19,7 +19,7 @@ FuncItem funcItem[nbFunc];
 
 //
 // Initialize your plugin data here
-// It will be called while plugin loading   
+// It will be called while plugin loading
 //void pluginInit(HANDLE /*hModule*/)
 //{
 //	g_hMod = hModule;
@@ -103,7 +103,8 @@ void AlignParagraphs()
 	thePlugin.trigerAction(IDM_ALIGN_PARAGRAPHS);
 }
 
-enum_array<Action, int> action_index = []() {
+enum_array<Action, int> action_index = []()
+{
 	enum_array<Action, int> val;
 	val.fill(-1);
 	return val;
@@ -135,8 +136,8 @@ void commandMenuInit()
 
 	setNextCommand(L"---", nullptr);
 
-	action_index[Action::indexContents] = setNextCommand(Win32xx::LoadStringW(IDS_INDEX_CONTENTS).c_str(), IndexContents);
-	action_index[Action::headIndexContents] = setNextCommand(Win32xx::LoadStringW(IDS_HEAD_INDEX_CONTENTS).c_str(), HeadIndexContents);
+	action_index[Action::indexContents] = setNextCommand(Win32xx::LoadString(IDS_INDEX_CONTENTS).c_str(), IndexContents);
+	action_index[Action::headIndexContents] = setNextCommand(Win32xx::LoadString(IDS_HEAD_INDEX_CONTENTS).c_str(), HeadIndexContents);
 	action_index[Action::specificIndexContents] = setNextCommand(Win32xx::LoadString(IDS_SPECIFIC_INDEX_CONTENTS).c_str(), SpecificIndexContents);
 
 	setNextCommand(L"---", nullptr);
@@ -228,7 +229,7 @@ void openContentsViewerDlg()
 		//show/hide the dialog
 		thePlugin.SendNPPMsg(uMsg, 0, (LPARAM)dockData.hClient);
 		//set the check on menu item
-		//thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, 
+		//thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK,
 		//CContentsViewerDialog::FUNC_ARRAY[CContentsViewerDialog::EFI_TAGSVIEW]._cmdID, bCheck );
 		//Action::openContentsViewerDlg
 		//thePlugin.SendNPPMsg(NPPM_SETMENUITEMCHECK, funcItem[0action_index[Action::openContentsViewerDlg]]._cmdID, bCheck);
@@ -275,10 +276,10 @@ void openAboutDlg()
 {
 	//::CreateDialog((HINSTANCE)g_hMod, MAKEINTRESOURCE(IDD_ABOUTDLG), thePlugin.GetMainHWnd(), abtDlgProc);
 	// ::MessageBox(
-		// thePlugin.GetMainHWnd(),
-		// _T("Haha!"),
-		// NPP_PLUGIN_NAME,
-		// MB_OK);
+	// thePlugin.GetMainHWnd(),
+	// _T("Haha!"),
+	// NPP_PLUGIN_NAME,
+	// MB_OK);
 	static AboutBox aboutbox;
 	aboutbox.OnHelpAbout(L"v0.6");
 }
@@ -288,7 +289,6 @@ void openAboutDlg()
 void pluginCleanUp()
 {
 }
-
 
 //-----------------------------------------------
 
@@ -300,12 +300,12 @@ extern "C" __declspec(dllexport) void setInfo(NPPData notpadPlusData)
 	// thePlugin.SetMainHWnd(notpadPlusData._nppHandle);
 }
 
-extern "C" __declspec(dllexport) const TCHAR * getName()
+extern "C" __declspec(dllexport) const TCHAR *getName()
 {
 	return NPP_PLUGIN_NAME;
 }
 
-extern "C" __declspec(dllexport) FuncItem * getFuncsArray(int *nbF)
+extern "C" __declspec(dllexport) FuncItem *getFuncsArray(int *nbF)
 {
 	*nbF = nbFunc;
 	return funcItem;
@@ -359,13 +359,13 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification *pscn)
 	}
 }
 
-// Here you can process the NPP Messages 
+// Here you can process the NPP Messages
 // I will make the messages accessible little by little, according to the need of plugin development.
 // Please let me know if you need to access to some messages :
 // http://sourceforge.net/forum/forum.php?forum_id=482781
 //
 extern "C" __declspec(dllexport) LRESULT messageProc(UINT message, WPARAM wParam, LPARAM lParam)
-{/*
+{ /*
 	if (Message == WM_MOVE)
 	{
 		::MessageBox(NULL, "move", "", MB_OK);

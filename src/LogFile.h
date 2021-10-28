@@ -23,7 +23,7 @@ change Log
 //#endif
 //
 //#define _CRT_NON_CONFORMING_SWPRINTFS
-#pragma warning (disable: 4996)
+#pragma warning(disable : 4996)
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
@@ -45,7 +45,7 @@ using namespace std;
 class CLogFile
 {
 public:
-	CLogFile(const TCHAR* file) 
+	CLogFile(const wchar_t *file)
 	{
 		m_pLog = NULL;
 		StartLog(file);
@@ -58,22 +58,24 @@ public:
 		//_tcscpy(m_tszFileName, _T("D:\\Log.txt"));
 	}
 
-	virtual ~CLogFile(void) {
-		if(m_pLog != NULL) fclose(m_pLog);
+	virtual ~CLogFile(void)
+	{
+		if (m_pLog != NULL)
+			fclose(m_pLog);
 	};
 
 private:
-	FILE* m_pLog;
+	FILE *m_pLog;
 
 public:
-	void StartLog(const TCHAR* pFilePath) 
+	void StartLog(const wchar_t *pFilePath)
 	{
 #ifdef _WIN32
-		OutputDebugString(pFilePath);
-		OutputDebugString(_T("\r\n"));
+		OutputDebugStringW(pFilePath);
+		OutputDebugStringW(L"\r\n");
 #endif
 
-		m_pLog = _tfopen(pFilePath, _T("w+"));
+		m_pLog = _wfopen(pFilePath, L"w+");
 		//_tfopen_s(&m_pLog, pFilePath, _T("w+"));
 
 		assert(m_pLog);
@@ -104,7 +106,7 @@ public:
 		LogOut(_T("OS time:\t%s\t%s\n\n"), datebuf, timebuf);
 	}
 
-	void LogOut(const wchar_t* wszString, ...)
+	void LogOut(const wchar_t *wszString, ...)
 	{
 		// assert(m_pLog);
 
@@ -121,7 +123,7 @@ public:
 		// int n = sizeof(wszBuffer) / sizeof(wchar_t);
 
 		_vsnwprintf(wszBuffer, sizeof(wszBuffer) / sizeof(wchar_t),
-			wszString, pArgList);
+					wszString, pArgList);
 
 		// The va_end macro just zeros out pArgList for no good reason
 
@@ -133,10 +135,11 @@ public:
 #else
 
 #endif
-		if (NULL == m_pLog) return;
+		if (NULL == m_pLog)
+			return;
 
 #ifdef UNICODE
-		_wsetlocale(0, _T("chs")); //必须加上，否则fwprintf对中文不支持
+		_wsetlocale(LC_ALL, L"chs"); // 必须加上，否则fwprintf对中文不支持
 #endif
 		fwprintf(m_pLog, wszBuffer);
 		//fwprintf(m_pLog, _T("\n"));
@@ -144,7 +147,7 @@ public:
 		fflush(m_pLog);
 	}
 
-	void LogOut(const char* szString, ...)
+	void LogOut(const char *szString, ...)
 	{
 		// assert(m_pLog);
 
@@ -157,9 +160,9 @@ public:
 		va_start(pArgList, szString);
 
 		// The last argument to wvsprintf points to the arguments
-	
+
 		_vsnprintf(szBuffer, sizeof(szBuffer) / sizeof(char),
-			szString, pArgList);
+				   szString, pArgList);
 
 		// The va_end macro just zeroes out pArgList for no good reason
 
@@ -171,7 +174,8 @@ public:
 #else
 
 #endif
-		if (NULL == m_pLog) return;
+		if (NULL == m_pLog)
+			return;
 		//_twsetlocale(0, T"chs"); //必须加上，否则fwprintf对中文不支持
 
 		fprintf(m_pLog, szBuffer);
@@ -183,23 +187,24 @@ public:
 
 //extern CLogFile theLogFile;
 extern bool g_bDebug;
-extern CLogFile* g_pLogFile; //= &theLogFile;
+extern CLogFile *g_pLogFile; //= &theLogFile;
 
 //for debuging
-#define LOGORNOT	\ g_bDebug && m_bDebug
-#define LOGORNOT2	\ g_bDebug && bDebug
+#define LOGORNOT	\ g_bDebug &&m_bDebug
+#define LOGORNOT2	\ g_bDebug &&bDebug
 
-#define BGNLOG		\
+#define BGNLOG \
 	bool m_bDebug = true;
 
-#define ENDLOG		\
+#define ENDLOG \
 	bool m_bDebug = false;
 
 //#define LOGMSG		\
 //	if(g_bDebug && m_bDebug) theLogFile.LogOut
-#define LOGMSG		\
-	if(g_bDebug && m_bDebug) g_pLogFile->LogOut
-	
+#define LOGMSG                \
+	if (g_bDebug && m_bDebug) \
+	g_pLogFile->LogOut
+
 //#define LOGOUT theLogFile.LogOut
 #define LOGOUT g_pLogFile->LogOut
 
@@ -209,54 +214,62 @@ extern CLogFile* g_pLogFile; //= &theLogFile;
 // #define LOGMSG LOGOUT
 // #define LOGMSGA LOGOUTA
 
-#define LOGFUNBGN		\
-	m_bDebug = true;		\
-	if(g_bDebug && m_bDebug) {	\
-		LOGOUT("INFO:\tL%d, %s is to start.\n", __LINE__, __FUNCTION__);		\
+#define LOGFUNBGN                                                        \
+	m_bDebug = true;                                                     \
+	if (g_bDebug && m_bDebug)                                            \
+	{                                                                    \
+		LOGOUT("INFO:\tL%d, %s is to start.\n", __LINE__, __FUNCTION__); \
 	}
 
-#define LOGFUNEND		\
-	if(g_bDebug && m_bDebug) {	\
-		LOGOUT("INFO:\t%s is finished.\n", __FUNCTION__);		\
+#define LOGFUNEND                                         \
+	if (g_bDebug && m_bDebug)                             \
+	{                                                     \
+		LOGOUT("INFO:\t%s is finished.\n", __FUNCTION__); \
 	}
 
-#define LOGFUNMSG		\
-	if(g_bDebug) {		\
-		LOGOUT("Line: %d, %s\n", __LINE__, __FUNCTION__);		\
-	}
-	
-#define LOGINFO(tInfo, ...)	\
-	if(g_bDebug && m_bDebug) {	\
-		LOGOUT("INFO:\t");	\
-		LOGOUT(tInfo, ## __VA_ARGS__);		\
-		LOGOUT("\n");		\
+#define LOGFUNMSG                                         \
+	if (g_bDebug)                                         \
+	{                                                     \
+		LOGOUT("Line: %d, %s\n", __LINE__, __FUNCTION__); \
 	}
 
-#define LOGWARN(tErr, ...)\
-	if(g_bDebug && m_bDebug) {	\
-		LOGOUT("WARN:\t");	\
-		LOGOUT(tErr, ## __VA_ARGS__);	\
-		LOGOUT("\n");	\
+#define LOGINFO(tInfo, ...)           \
+	if (g_bDebug && m_bDebug)         \
+	{                                 \
+		LOGOUT("INFO:\t");            \
+		LOGOUT(tInfo, ##__VA_ARGS__); \
+		LOGOUT("\n");                 \
 	}
 
-#define LOGERR(tErr, ...)\
-	if(g_bDebug && m_bDebug) {	\
-		LOGOUT("ERROR:\t");	\
-		LOGOUT(tErr, ## __VA_ARGS__);	\
-		LOGOUT("\n");	\
+#define LOGWARN(tErr, ...)           \
+	if (g_bDebug && m_bDebug)        \
+	{                                \
+		LOGOUT("WARN:\t");           \
+		LOGOUT(tErr, ##__VA_ARGS__); \
+		LOGOUT("\n");                \
 	}
 
-#define LOGOK(tOK, ...)	\
-	if(g_bDebug && m_bDebug) {	\
-		LOGOUT("OK:\t");		\
-		LOGOUT(tOK, ## __VA_ARGS__);		\
-		LOGOUT("\n");		\
+#define LOGERR(tErr, ...)            \
+	if (g_bDebug && m_bDebug)        \
+	{                                \
+		LOGOUT("ERROR:\t");          \
+		LOGOUT(tErr, ##__VA_ARGS__); \
+		LOGOUT("\n");                \
 	}
 
-#define VOK(b) 	\
-	if(!b) {	\
-		LOGERR(#b); 	\
-		return false;	\
+#define LOGOK(tOK, ...)             \
+	if (g_bDebug && m_bDebug)       \
+	{                               \
+		LOGOUT("OK:\t");            \
+		LOGOUT(tOK, ##__VA_ARGS__); \
+		LOGOUT("\n");               \
+	}
+
+#define VOK(b)        \
+	if (!b)           \
+	{                 \
+		LOGERR(#b);   \
+		return false; \
 	}
 
 //#define VLOG(b)	\
@@ -266,11 +279,16 @@ extern CLogFile* g_pLogFile; //= &theLogFile;
 //	}	\
 //	else LOGOK(#b);
 
-#define VLOG(b) 	\
-	if(!b) {LOGERR(#b); return false;}	\
-		else LOGOK(#b);
+#define VLOG(b)       \
+	if (!b)           \
+	{                 \
+		LOGERR(#b);   \
+		return false; \
+	}                 \
+	else              \
+		LOGOK(#b);
 
-void PrintDebugString(const char* szString, ...);
-void PrintDebugString(const wchar_t* wszString, ...);
+void PrintDebugString(const char *szString, ...);
+void PrintDebugString(const wchar_t *wszString, ...);
 
-#endif//!__LOGFILE__H__
+#endif //!__LOGFILE__H__

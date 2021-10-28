@@ -4,11 +4,12 @@
 * support English contents
 * manage shortcut of command
 * mark/export miss or empty contents
-* github/add in Plugins Admin of Notepad++
+* add in "Plugins Admin" of Notepad++
 * color content
 * capture print of python script
 * support parse only by CDocument
 * rewrite in C++ 11
+* highlight and jump to correspond item when open
 
 
 ## Known bugs

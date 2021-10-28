@@ -103,7 +103,7 @@ private:
 	wstring m_wIndex;
 
 	mapContent_t m_mapContent;
-	map<int, tString> m_mapScriptMenu;
+	map<int, wstring> m_mapScriptMenu;
 	// map<tString, tString> m_mapScriptExe;
 	// vector<tString> m_vecScriptExt;
 	CScriptPlugin* m_pScriptPlugin;
